@@ -6,11 +6,11 @@ export function HomeLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <Suspense fallback={<div>Loading...</div>}>
-            </Suspense>
-            
-            {children}
-        </html>
+        <div lang="en">
+                <Suspense fallback={<div>Loading...</div>}>
+                </Suspense>
+
+                {children}
+        </div>
     );
 }
