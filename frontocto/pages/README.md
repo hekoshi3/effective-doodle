@@ -1,0 +1,1 @@
+# This folder exists to implement [Feature-Sliced Design](https://feature-sliced.design) pattern and prevent NextJS use Pages Router from src/pages
