@@ -3,7 +3,7 @@
 import { AuthContext, User } from "@/entities/user";
 import React, { useEffect, useMemo, useState, ReactNode } from "react";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://192.168.24.37:8002/api";
 
 interface AuthProviderProps {
   children: ReactNode;

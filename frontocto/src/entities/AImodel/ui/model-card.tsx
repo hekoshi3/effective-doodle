@@ -1,17 +1,9 @@
-import { ReactNode } from "react";
-import { Model } from "../types";
-
-interface Props {
-    model: Model;
-    actionSlot?: ReactNode;
-    statusBadge?: ReactNode;
-    index?: number;
-}
+import { CardProps } from "../types";
 
 import Image from "next/image"
 import Link from "next/link";
 
-export const ModelCard = ({ model, actionSlot, statusBadge, index = 0 }: Props) => {
+export const ModelCard = ({ model, actionSlot, statusBadge, index = 0 }: CardProps) => {
     return (
         <div key={index} className="relative group bg-neutral-800 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl hover:scale-[1.01]">
 

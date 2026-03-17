@@ -3,8 +3,9 @@
 
 //import "@/app/components/navbar"
 import { GalleryImage, BackdendResIMG } from "@/entities/AIimage";
-import { Model, BackdendResMODEL, ModelCard } from "@/entities/AImodel";
+import { Model, BackdendResMODEL } from "@/entities/AImodel";
 import { User, useAuth } from "@/entities/user";
+import { AuthModelCard } from "@/features/manage-model";
 import { useEffect, useState } from "react";
 
 const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
@@ -247,7 +248,7 @@ export function MainPage() {
                     <div className="text-center py-20 text-neutral-500 italic">No models found in this feed.</div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                        {models.slice(0, 18).map((model, i) => <ModelCard key={model.id} model={model} index={i} />)}
+                        {models.slice(0, 18).map((model, i) => <AuthModelCard key={model.id} model={model} index={i} />)}
                     </div>
                 )}
             </section>
