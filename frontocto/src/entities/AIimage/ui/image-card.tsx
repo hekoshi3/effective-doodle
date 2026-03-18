@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const ImageCard = ({ image, actionSlot, statusBadge, index = 0 }: ImgCardProps) => {
     return (
-        <div key={index} className="relative group bg-neutral-800 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl hover:scale-[1.01]">
+        <div key={index} className="relative group bg-neutral-800 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl hover:scale-[1]">
 
             <Link href={`/generated/${image.id}`} className="block relative w-full aspect-2/3">
                 <Image
@@ -19,7 +19,7 @@ export const ImageCard = ({ image, actionSlot, statusBadge, index = 0 }: ImgCard
                 <div className="absolute inset-0 bg-linear-to-t from-black/95 via-transparent to-black/40 opacity-80 group-hover:opacity-100 transition-opacity" />
             </Link>
 
-            <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-start z-20">
+            <div className="absolute bottom-0 left-0 right-0 p-3 flex justify-between items-start z-20">
                 <div>
                     {statusBadge}
                 </div>
@@ -29,7 +29,7 @@ export const ImageCard = ({ image, actionSlot, statusBadge, index = 0 }: ImgCard
                 </div>
             </div>
 
-            <div className="dropdown dropdown-end">
+            <div className="absolute top-0 right-0 p-3 dropdown dropdown-end">
                 <div tabIndex={0} role="button" className="bg-black/40 hover:bg-black/60 cursor-pointer rounded-lg p-2 backdrop-blur-md transition-all">
                     <Image src="/menu-white.svg" alt="Menu" width={18} height={18} />
                 </div>
