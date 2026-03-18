@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-import { Model } from "./AImodel.types";
+import { GalleryImage } from "./image.types";
 
-export interface CardProps {
-    model: Model;
+export interface ImgCardProps {
+    image: GalleryImage;
     actionSlot?: ReactNode;
     statusBadge?: ReactNode;
     index?: number;

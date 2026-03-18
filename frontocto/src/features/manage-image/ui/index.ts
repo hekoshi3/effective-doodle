@@ -1,0 +1,1 @@
+export { AuthImageCard } from "./AuthImageCard"

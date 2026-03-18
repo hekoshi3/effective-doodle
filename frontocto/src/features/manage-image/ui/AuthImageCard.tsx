@@ -1,15 +1,16 @@
-import { ModelCardProps, ModelCard } from "@/entities/AImodel";
+import { ImgCardProps } from "@/entities/AIimage";
+import { ImageCard } from "@/entities/AIimage/ui/image-card";
 import { useAuth } from "@/entities/user"
 import Link from "next/link";
 
-export const AuthModelCard = ({ model, index}: ModelCardProps) => {
+export const AuthImageCard = ({ image, index}: ImgCardProps) => {
     const { user } = useAuth();
-    const isOwner = model.authorId === user?.id;    
+    const isOwner = image.authorId === user?.id;
 
     return (
-        <ModelCard model={model} actionSlot={isOwner ?
+        <ImageCard image={image} actionSlot={isOwner ?
             <Link
-                href={`/model/edit/${model.id}`}
+                href={`/image/edit/${image.id}`}
                 className="bg-black/40 hover:bg-accent hover:text-black p-2 rounded-lg backdrop-blur-md transition-all text-white"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,11 +19,11 @@ export const AuthModelCard = ({ model, index}: ModelCardProps) => {
             </Link>
             :
             <></>}
-            statusBadge={!isOwner && !model.is_published ?
+            statusBadge={!isOwner && !image.is_published ?
                 <div className="bg-yellow-500 text-black text-[10px] font-bold px-2 py-1 rounded shadow-md uppercase">
                     Draft
                 </div>
                 : <></>} index={index}>
-        </ModelCard>
+        </ImageCard>
     );
 }

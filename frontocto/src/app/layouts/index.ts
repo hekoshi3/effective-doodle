@@ -1,2 +1,2 @@
-export {RootLayout} from "./root";
+export { RootLayout } from "./root";
 export { HomeLayout } from "./home";

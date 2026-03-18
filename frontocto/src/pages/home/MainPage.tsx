@@ -5,6 +5,7 @@
 import { GalleryImage, BackdendResIMG } from "@/entities/AIimage";
 import { Model, BackdendResMODEL } from "@/entities/AImodel";
 import { User, useAuth } from "@/entities/user";
+import { AuthImageCard } from "@/features/manage-image";
 import { AuthModelCard } from "@/features/manage-model";
 import { useEffect, useState } from "react";
 
@@ -133,7 +134,6 @@ export function MainPage() {
 
     return (
         <main className="bg-neutral-900 min-h-screen p-4 sm:p-8 text-white">
-            
             <div className="absolute right-0 left-0 top-15 flex justify-center mb-10">
                 <div className="inline-flex bg-neutral-800 p-1 rounded-xl border border-neutral-700 shadow-lg">
                     <button 
@@ -201,7 +201,7 @@ export function MainPage() {
                     <div className="text-center py-20 text-neutral-500 italic">No images found in this feed.</div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                        {/*gallery.map((img, i) => <ImgCard key={img.id} img={img} index={i} />)*/}
+                        {gallery.map((img, i) => <AuthImageCard key={img.id} image={img} index={i} />)}
                     </div>
                 )}
             </section>

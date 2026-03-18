@@ -1,4 +1,3 @@
-import AuthProvider from "@/app/providers/AuthProvider";
 import { Header } from "@/widgets/header";
 import { Suspense } from "react";
 
@@ -9,13 +8,13 @@ export function HomeLayout({
 }>) {
     return (
         <div lang="en">
-            <AuthProvider>
                 <Suspense fallback={<div>Loading...</div>}>
                 </Suspense>
-                
-                {children}
-            </AuthProvider>
 
+                <div className="flex flex-col overflow-x-clip">
+                    <Header />
+                    <main className="flex grow flex-col">{children}</main>
+                </div>
         </div>
     );
 }

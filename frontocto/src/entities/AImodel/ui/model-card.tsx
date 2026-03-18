@@ -1,9 +1,9 @@
-import { CardProps } from "../types";
+import { ModelCardProps } from "../types";
 
 import Image from "next/image"
 import Link from "next/link";
 
-export const ModelCard = ({ model, actionSlot, statusBadge, index = 0 }: CardProps) => {
+export const ModelCard = ({ model, actionSlot, statusBadge, index = 0 }: ModelCardProps) => {
     return (
         <div key={index} className="relative group bg-neutral-800 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl hover:scale-[1.01]">
 
