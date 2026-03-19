@@ -12,7 +12,6 @@ export function HomeLayout({
                 </Suspense>
 
                 <div className="flex flex-col overflow-x-clip">
-                    <Header />
                     <main className="flex grow flex-col">{children}</main>
                 </div>
         </div>
