@@ -1,0 +1,1 @@
+export { PushToUser as default } from "@/pages/user";

@@ -1,14 +1,13 @@
 import { Suspense } from "react";
 
-export function HomeLayout({
+export function UserLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <div lang="en">
-                <Suspense fallback={<div>Loading...</div>}>
-                </Suspense>
+                
 
                 <div className="flex flex-col overflow-x-clip">
                     <main className="flex grow flex-col">{children}</main>

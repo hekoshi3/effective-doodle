@@ -32,9 +32,9 @@ export function AuthPage() {
         if (imagesResponse.ok) {
           const imagesData = await imagesResponse.json();
           const userImage = imagesData.results?.find(
-            (img: any) => img.author?.username === userData.username
+            (img: any) => img.authorId === userData.id
           );
-          if (userImage?.author?.id) {
+          if (userImage?.authorId) {
             return userImage.author.id;
           }
         }
