@@ -42,20 +42,26 @@ export const ModelCard = ({ model, actionSlot, statusBadge, index = 0 }: ModelCa
                 </div>
 
                 <div className="flex items-center justify-between">
-                    <Link href={`/user/${model.authorId}`} className="flex items-center gap-2 group/author max-w-[65%]">
+                    <Link href={`/user/${model.author.username}`} className="flex items-center gap-2 group/author max-w-[65%]">
                         <div className="relative w-7 h-7 shrink-0">
                             <Image
-                                /*!!! there should be url from user profile, but with refactroing, we did authorId instead of whole Author instance. 
-                                should implement parse after or refactr this part with more optimised solution */
-                                src={ /*model.author.?? ||*/ "/img/nacho.png"}
-                                alt={"Anonymous" /*model.author.username */}
+                                /* !!! there should be url from user profile, but with refactroing, we did authorId instead of whole Author instance. 
+                                should implement parse after or refactr this part with more optimised solution /// 
+                                // !!! upd: we still need to make proper parser after refactor, mb with Zog */
+                                src={model.author.profile.avatar || "/img/nacho.png"}
+                                alt={model.author.username}
                                 fill
                                 className="rounded-full border border-white/20 object-cover"
                             />
                         </div>
-                        <span className="text-xs font-medium text-neutral-200 truncate group-hover/author:text-white">
-                            {"Anonymous"/*model.author.username*/}
-                        </span>
+                        <div className="min-w-0">
+                            <h4 className="text-sm font-bold text-white truncate group-hover/author:text-accent transition-colors">
+                                { model.author.username  }
+                            </h4>
+                            <p className="text-[10px] text-neutral-400 truncate">
+                                {model.author.followers_count} followers
+                            </p>
+                        </div>
                     </Link>
 
                     {/*<button

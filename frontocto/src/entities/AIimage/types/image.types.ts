@@ -7,7 +7,17 @@ export interface BackdendResIMG {
 
 export interface GalleryImage {
   id: number;
-  authorId: number;
+  author: {
+    // !!!
+    id: number;
+    username: string;
+    profile: {
+      avatar: string | null;
+    };
+    avatar: string;
+    followers_count: number;
+    is_following: boolean;
+  };
   is_liked: boolean;
   image: string;
   path: string;

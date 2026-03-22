@@ -4,7 +4,9 @@ import Link from "next/link";
 
 export const AuthModelCard = ({ model, index}: ModelCardProps) => {
     const { user } = useAuth();
-    const isOwner = model.authorId === user?.id;
+    console.log(model.author.id)
+    const isOwner = model.author.id === user?.id;
+    
 
     return (
         <ModelCard model={model} actionSlot={isOwner ?

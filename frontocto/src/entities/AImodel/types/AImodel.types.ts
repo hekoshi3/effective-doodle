@@ -8,7 +8,17 @@ export interface BackdendResMODEL {
 export interface Model {
   tags: string[];
   id: number;
-  authorId: number;
+  author: {
+    // !!!
+    id: number;
+    username: string;
+    profile: {
+      avatar: string | null;
+    };
+    avatar: string;
+    followers_count: number;
+    is_following: boolean;
+  };
   is_liked: boolean;
   name: string;
   model_type: string;

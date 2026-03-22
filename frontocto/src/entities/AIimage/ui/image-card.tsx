@@ -44,21 +44,21 @@ export const ImageCard = ({ image, actionSlot, statusBadge, index = 0 }: ImgCard
 
             <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
                 <div className="flex items-center justify-between">
-                    <Link href={`/user/${image.authorId}`} className="flex items-center gap-2 group/author max-w-[65%]">
-                        <div className="relative w-8 h-8 flex-shrink-0">
+                    <Link href={`/user/${image.author.username}`} className="flex items-center gap-2 group/author max-w-[65%]">
+                        <div className="relative w-8 h-8 shrink-0">
                             <Image
-                                src={/*image.author.profile?.avatar ||*/ "/img/nacho.png"}
-                                alt={ /*image.author.username */ "Anonimous"}
+                                src={image.author.profile?.avatar || "/img/nacho.png"}
+                                alt={ image.author.username || "Anonimous"}
                                 fill
                                 className="rounded-full border border-white/20 object-cover"
                             />
                         </div>
                         <div className="min-w-0">
                             <h4 className="text-sm font-bold text-white truncate group-hover/author:text-accent transition-colors">
-                                { /*image.author.username */ }
+                                { image.author.username  }
                             </h4>
                             <p className="text-[10px] text-neutral-400 truncate">
-                                {image.authorId} followers
+                                {image.author.followers_count} followers
                             </p>
                         </div>
                     </Link>

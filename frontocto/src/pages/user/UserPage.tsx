@@ -79,7 +79,7 @@ export function UserPage() {
 
                 if (imagesRes.ok) {
                     const imagesData: BackdendResIMG = await imagesRes.json();
-                    const userImages = imagesData.results.filter((img) => img.authorId === userData.id);
+                    const userImages = imagesData.results.filter((img) => img.author.id === userData.id);
                     setGallery(userImages.reverse());
                 }
 
@@ -89,7 +89,7 @@ export function UserPage() {
 
                 if (modelsRes.ok) {
                     const modelsData: BackdendResMODEL = await modelsRes.json();
-                    const userModels = modelsData.results.filter((model) => model.authorId === userData.id);
+                    const userModels = modelsData.results.filter((model) => model.author.id === userData.id);
                     setModels(userModels.reverse());
                 }
             } catch (err: any) {

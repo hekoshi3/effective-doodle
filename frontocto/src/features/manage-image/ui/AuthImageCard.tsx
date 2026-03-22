@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const AuthImageCard = ({ image, index}: ImgCardProps) => {
     const { user } = useAuth();
-    const isOwner = image.authorId === user?.id;
+    const isOwner = image.author.id === user?.id;
 
     return (
         <ImageCard image={image} actionSlot={isOwner ?
