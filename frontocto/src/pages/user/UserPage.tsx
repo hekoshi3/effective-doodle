@@ -7,9 +7,10 @@ import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { GalleryImage, BackdendResIMG } from "@/entities/AIimage";
-import { BackdendResMODEL, Model, ModelCard } from "@/entities/AImodel";
+import { BackdendResMODEL, Model } from "@/entities/AImodel";
 import { useAuth, Analytics, User } from "@/entities/user";
 import { AuthImageCard } from "@/features/manage-image";
+import { AuthModelCard } from "@/features/manage-model";
 
 
 const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
@@ -150,10 +151,10 @@ export function UserPage() {
                         <circle key={i} cx={i * step} cy={height - (d.count / maxCount) * height} r="3" fill="#3b82f6" className="hover:r-4 transition-all cursor-pointer" />
                     ))}
                 </svg>
-                <div className="flex justify-between mt-2 text-[10px] text-neutral-500">
-                    <span>{data[0].date}</span>
-                    <span>{data[data.length-1].date}</span>
-                </div>
+                {/*<div className="flex justify-between mt-2 text-[10px] text-neutral-500">
+                    <span>{data[0].date ? data[0].date : "n/a"}</span>
+                    <span>{data[data.length-1].date ? data[data.length-1].date : "n/a"}</span>
+                </div>*/}
             </div>
         );
     };
@@ -191,7 +192,6 @@ export function UserPage() {
 
                 <div className="flex flex-col lg:flex-row">
                     <div className="flex-1 overflow-y-auto pt-4 pl-4 pr-4 lg:pr-8">
-                        {/* Tabs */}
                         <div className="flex gap-4 mb-6 border-b border-neutral-800">
                             {["images", "models", "analytics"].map((tab) => (
                                 <button
@@ -209,7 +209,7 @@ export function UserPage() {
                         {activeTab === "images" && (
                             gallery.length > 0 ? (
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                                    {gallery.map((img, index) => <AuthImageCard key={img.id ?? index} image={img} index={index} />)}
+                                    {gallery.map((img, index) => <AuthImageCard  key={img.id ?? index} image={img} index={index} />)}
                                 </div>
                             ) : <div className="flex items-center justify-center h-64 text-neutral-400">No images yet</div>
                         )}
@@ -217,7 +217,7 @@ export function UserPage() {
                         {activeTab === "models" && (
                             models.length > 0 ? (
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                                    {models.map((model, index) => <ModelCard key={model.id ?? index} model={model} index={index} />)}
+                                    {models.map((model, index) => <AuthModelCard key={model.id ?? index} model={model} index={index} />)}
                                 </div>
                             ) : <div className="flex items-center justify-center h-64 text-neutral-400">No models yet</div>
                         )}
@@ -229,15 +229,14 @@ export function UserPage() {
                                         <ActivityGraph data={analytics.activity_graph} />
                                         
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {/* Top Models */}
                                             <div className="bg-neutral-800/30 p-4 rounded-xl border border-neutral-800">
                                                 <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                                                    🔥 Популярные модели
+                                                    Популярные модели
                                                 </h3>
                                                 <div className="space-y-3">
                                                     {analytics.top_models.map(m => (
                                                         <div key={m.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
-                                                            <Link href={"/model/"+m.id} className="text-sm truncate max-w-[150px]">{m.name}</Link>
+                                                            <Link href={"/model/"+m.id} className="text-sm truncate max-w-37.5">{m.name}</Link>
                                                             <div className="flex gap-3 text-xs">
                                                                 <span className="text-blue-400">⬇ {m.downloads_count}</span>
                                                                 <span className="text-pink-400">❤ {m.likes_count}</span>
@@ -247,10 +246,9 @@ export function UserPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Top Images */}
                                             <div className="bg-neutral-800/30 p-4 rounded-xl border border-neutral-800">
                                                 <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                                                    🖼 Топ изображений
+                                                    Топ изображений
                                                 </h3>
                                                 <div className="space-y-3">
                                                     {analytics.top_images.map(img => (
@@ -291,7 +289,6 @@ export function UserPage() {
                                 </button>
                             )}
 
-                            {/* Statistics из UserProfileData */}
                             {currentUserProfile && (
                                 <div className="grid grid-cols-2 gap-4 mt-8 w-full">
                                     <div className="bg-neutral-800/40 p-3 rounded-xl text-center">

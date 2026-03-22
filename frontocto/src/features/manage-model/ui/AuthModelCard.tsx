@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const AuthModelCard = ({ model, index}: ModelCardProps) => {
     const { user } = useAuth();
-    const isOwner = model.authorId === user?.id;    
+    const isOwner = model.authorId === user?.id;
 
     return (
         <ModelCard model={model} actionSlot={isOwner ?
@@ -18,7 +18,7 @@ export const AuthModelCard = ({ model, index}: ModelCardProps) => {
             </Link>
             :
             <></>}
-            statusBadge={!isOwner && !model.is_published ?
+            statusBadge={isOwner && !model.is_published ?
                 <div className="bg-yellow-500 text-black text-[10px] font-bold px-2 py-1 rounded shadow-md uppercase">
                     Draft
                 </div>
