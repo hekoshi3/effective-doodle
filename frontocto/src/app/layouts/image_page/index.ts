@@ -1,0 +1,1 @@
+export { ImageLayout } from "./ImagePage";

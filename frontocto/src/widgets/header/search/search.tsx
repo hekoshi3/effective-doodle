@@ -115,7 +115,7 @@ export const NavbarSearch = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="text-sm font-bold text-white truncate group-hover:text-accent">{model.name}</div>
-                                        <div className="text-[10px] text-neutral-500 uppercase">{model.model_type} • {model.authorId /* !!! */}</div>
+                                        <div className="text-[10px] text-neutral-500 uppercase">{model.model_type} • {model.author.id /* !!! */}</div>
                                     </div>
                                 </Link>
                             ))}
@@ -136,7 +136,7 @@ export const NavbarSearch = () => {
                                     >
                                         <Image src={img.image} alt="" fill className="object-cover" />
                                         <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-1 text-[9px] text-white truncate">
-                                            @{img.authorId /* !!! */}
+                                            @{img.author.id /* !!! */}
                                         </div>
                                     </Link>
                                 ))}

@@ -1,0 +1,1 @@
+export { ImageDetailPage as default } from "@/pages/image"

@@ -7,7 +7,7 @@ export const ImageCard = ({ image, actionSlot, statusBadge, index = 0 }: ImgCard
     return (
         <div key={index} className="relative group bg-neutral-800 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl hover:scale-[1]">
 
-            <Link href={`/generated/${image.id}`} className="block relative w-full aspect-2/3">
+            <Link href={`/image/${image.id}`} className="block relative w-full aspect-2/3">
                 <Image
                     src={image.image}
                     alt={"Image" + image.id}

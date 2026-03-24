@@ -1,0 +1,1 @@
+export {ImageLayout as default} from "@/app/layouts/image_page" 

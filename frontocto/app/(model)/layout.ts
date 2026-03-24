@@ -1,0 +1,1 @@
+export {ModelLayout as default} from "@/app/layouts/model_page" 
