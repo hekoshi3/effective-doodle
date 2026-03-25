@@ -1,1 +1,2 @@
-export {ModelDetailPage} from "./ModelPage"
+export { ModelDetailPage } from "./ModelPage";
+export { ModelEditPage } from "./edit/editModel";

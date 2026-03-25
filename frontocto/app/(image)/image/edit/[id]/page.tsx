@@ -1,0 +1,1 @@
+export { ImageEditPage as default} from "@/pages/image"
