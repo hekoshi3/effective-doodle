@@ -10,9 +10,12 @@ import { useAuth } from "@/entities/user";
 const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
 
 export function ImageEditPage() {
-    const { id } = useParams<{ id: string }>();
+    const params = useParams();
+    const id = params?.id
     const router = useRouter();
     const auth = useAuth();
+    
+    console.log(id)
 
     const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (
         url: string,
