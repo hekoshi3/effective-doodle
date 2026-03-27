@@ -10,8 +10,8 @@ export function ModelLayout({
                 <Suspense fallback={<div>Loading...</div>}>
                 </Suspense>
 
-                <div className="flex flex-col overflow-x-clip">
-                    <main className="flex grow flex-col">{children}</main>
+                <div className="overflow-x-clip">
+                    <main className="">{children}</main>
                 </div>
         </div>
     );

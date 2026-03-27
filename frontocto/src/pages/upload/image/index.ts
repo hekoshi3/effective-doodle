@@ -1,0 +1,1 @@
+export {ImageUploadPage } from "./UploadImagePage"

@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 export function UserLayout({
     children,
 }: Readonly<{
@@ -7,10 +5,8 @@ export function UserLayout({
 }>) {
     return (
         <div lang="en">
-                
-
-                <div className="flex flex-col overflow-x-clip">
-                    <main className="flex grow flex-col">{children}</main>
+                <div className="overflow-x-clip">
+                    <main className="">{children}</main>
                 </div>
         </div>
     );

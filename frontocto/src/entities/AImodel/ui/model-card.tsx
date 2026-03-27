@@ -3,9 +3,9 @@ import { ModelCardProps } from "../types";
 import Image from "next/image"
 import Link from "next/link";
 
-export const ModelCard = ({ model, actionSlot, statusBadge, index = 0 }: ModelCardProps) => {
+export const ModelCard = ({ model, statusBadge, index = 0 }: ModelCardProps) => {
     return (
-        <div key={index} className="relative group bg-neutral-800 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl hover:scale-[1.01]">
+        <div key={index} className="relative group bg-neutral-800 rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl hover:scale-[1]">
 
             <Link href={`/model/${model.id}`} className="block relative w-full aspect-2/3">
                 <Image
@@ -19,19 +19,18 @@ export const ModelCard = ({ model, actionSlot, statusBadge, index = 0 }: ModelCa
                 <div className="absolute inset-0 bg-linear-to-t from-black/95 via-transparent to-black/40 opacity-80 group-hover:opacity-100 transition-opacity" />
             </Link>
 
-            <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-start z-20">
+            <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-start">
                 <div>
-                    {statusBadge}
                     {model.model_type && (
                         <div className="mt-1 bg-accent/90 text-black text-[9px] font-black px-1.5 py-0.5 rounded uppercase">
                             {model.model_type}
                         </div>
                     )}
-                </div>
-
-                <div className="flex gap-2">                  
-                    {actionSlot}
-                </div>
+                    <div className="pt-1">
+                        {statusBadge}
+                    </div>
+                    
+                </div>                
             </div>
             
             <div className="absolute bottom-0 left-0 right-0 p-4 z-20">

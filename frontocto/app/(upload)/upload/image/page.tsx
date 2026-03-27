@@ -1,0 +1,1 @@
+export { ImageUploadPage as default } from "@/pages/upload/image";
