@@ -1,0 +1,1 @@
+export {SettingsProfile as default} from "@/pages/user/"

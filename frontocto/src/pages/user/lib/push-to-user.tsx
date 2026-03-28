@@ -25,7 +25,7 @@ export function PushToUser() {
                 if (imagesResponse.ok) {
                     const imagesData = await imagesResponse.json();
                     const userImage = imagesData.results?.find(
-                        (img: GalleryImage) => img.authorId === userData.id
+                        (img: GalleryImage) => img.author.id === userData.id
                     );
                     if (userImage?.author?.username) {
                         router.push(`/user/${userImage.author.username}`);
@@ -41,6 +41,7 @@ export function PushToUser() {
     fetchUserId()
     return (
         <>
+        <div className="min-h-screen"></div>
         </>
     );
 }

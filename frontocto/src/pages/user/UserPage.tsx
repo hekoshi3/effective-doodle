@@ -183,7 +183,7 @@ export function UserPage() {
                     <div className="absolute inset-0 bg-linear-to-b from-transparent to-neutral-900"></div>
                     <div className="relative z-10 flex items-end justify-between p-4 h-full">
                         {auth.token && isOwnProfile && (
-                            <Link href={`/user/${username}/edit`} className="btn bg-neutral-950 rounded-xl font-light opacity-80 hover:opacity-100 transition-opacity">
+                            <Link href={`/settings`} className="btn bg-neutral-950 rounded-xl font-light opacity-80 hover:opacity-100 transition-opacity">
                                 Редактировать
                             </Link>
                         )}
