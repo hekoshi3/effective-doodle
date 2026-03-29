@@ -55,7 +55,7 @@ export function UserPage() {
                 const analyticsRes = auth.token
                     ? await makeAuthenticatedRequest(`${API_HOST}/users/analytics/`)
                     : await fetch(`${API_HOST}/users/analytics/`);
-                
+
                 if (analyticsRes.ok) {
                     const analyticsData: Analytics = await analyticsRes.json();
                     setAnalytics(analyticsData);
@@ -133,7 +133,7 @@ export function UserPage() {
         const height = 100;
         const width = 400;
         const step = width / (data.length - 1 || 1);
-        
+
         const points = data.map((d, i) => `${i * step},${height - (d.count / maxCount) * height}`).join(' ');
 
         return (
@@ -179,16 +179,27 @@ export function UserPage() {
 
     return (
         <main className="flex w-screen min-h-screen bg-neutral-900 text-neutral-200">
-            <div className="flex w-full flex-col">
-                <div className="h-64 border-b border-neutral-950 bg-[url(/img/nachosmile.jpg)] inset-0 bg-no-repeat bg-cover bg-center relative">
-                    <div className="absolute inset-0 bg-linear-to-b from-transparent to-neutral-900"></div>
-                    <div className="relative z-10 flex items-end justify-between p-4 h-full">
-                        {auth.token && isOwnProfile && (
-                            <Link href={`/settings`} className="btn bg-neutral-950 rounded-xl font-light opacity-80 hover:opacity-100 transition-opacity">
-                                Редактировать
-                            </Link>
-                        )}
+            <div className="flex w-full flex-col"> {/* bg-[url(/img/nachosmile.jpg)] */}
+                <div className="h-80 border-b border-neutral-950 relative">
+                    <div className="justify-center items-center">
+                        {userProfile.profile.banner ? <Image
+                            src={userProfile.profile.banner}
+                            alt="Profile banner"
+                            className="max-h-79 object-cover"
+                            height={512}
+                            width={1920}
+                            loading={"lazy"}>
+                        </Image> :
+                            <Image
+                                src="/img/nachosmile.jpg"
+                                alt="Profile banner"
+                                className="max-h-79 object-cover"
+                                height={320}
+                                width={1920}
+                                loading={"lazy"}>
+                            </Image>}
                     </div>
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent to-neutral-900"></div>
                 </div>
 
                 <div className="flex flex-col lg:flex-row">
@@ -198,9 +209,8 @@ export function UserPage() {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab as any)}
-                                    className={`pb-2 px-4 font-semibold transition-colors capitalize ${
-                                        activeTab === tab ? "text-white border-b-2 border-blue-500" : "text-neutral-400 hover:text-white"
-                                    }`}
+                                    className={`pb-2 px-4 font-semibold transition-colors capitalize ${activeTab === tab ? "text-white border-b-2 border-blue-500" : "text-neutral-400 hover:text-white"
+                                        }`}
                                 >
                                     {tab} {tab === "images" && `(${gallery.length})`} {tab === "models" && `(${models.length})`}
                                 </button>
@@ -210,7 +220,7 @@ export function UserPage() {
                         {activeTab === "images" && (
                             gallery.length > 0 ? (
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                                    {gallery.map((img, index) => <AuthImageCard  key={img.id ?? index} image={img} index={index} />)}
+                                    {gallery.map((img, index) => <AuthImageCard key={img.id ?? index} image={img} index={index} />)}
                                 </div>
                             ) : <div className="flex items-center justify-center h-64 text-neutral-400">No images yet</div>
                         )}
@@ -228,7 +238,7 @@ export function UserPage() {
                                 {analytics ? (
                                     <>
                                         <ActivityGraph data={analytics.activity_graph} />
-                                        
+
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="bg-neutral-800/30 p-4 rounded-xl border border-neutral-800">
                                                 <h3 className="text-white font-bold mb-4 flex items-center gap-2">
@@ -237,7 +247,7 @@ export function UserPage() {
                                                 <div className="space-y-3">
                                                     {analytics.top_models.map(m => (
                                                         <div key={m.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
-                                                            <Link href={"/model/"+m.id} className="text-sm truncate max-w-37.5">{m.name}</Link>
+                                                            <Link href={"/model/" + m.id} className="text-sm truncate max-w-37.5">{m.name}</Link>
                                                             <div className="flex gap-3 text-xs">
                                                                 <span className="text-blue-400">⬇ {m.downloads_count}</span>
                                                                 <span className="text-pink-400">❤ {m.likes_count}</span>
@@ -254,7 +264,7 @@ export function UserPage() {
                                                 <div className="space-y-3">
                                                     {analytics.top_images.map(img => (
                                                         <div key={img.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
-                                                            <Link href={"/image/"+img.id} className="text-sm text-neutral-500">ID: {img.id}</Link>
+                                                            <Link href={"/image/" + img.id} className="text-sm text-neutral-500">ID: {img.id}</Link>
                                                             <span className="text-pink-400 text-xs font-bold">❤ {img.likes_count} лайков</span>
                                                         </div>
                                                     ))}
@@ -275,7 +285,7 @@ export function UserPage() {
                         <div className="w-full flex flex-col items-center justify-center pt-10 px-4">
                             <div className="relative">
                                 {/* !!! */}
-                                <Image src={userProfile.profile.avatar  || "/img/nacho.png"} width={128} height={128} alt={userProfile.username} loading="eager" preload={true} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
+                                <Image src={userProfile.profile.avatar || "/img/nacho.png"} width={128} height={128} alt={userProfile.username} loading="eager" preload={true} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
                             </div>
                             <p className="text-2xl font-mono mt-4 text-white">{userProfile.username}</p>
                             {userProfile.bio && <p className="text-sm text-neutral-300 mt-2 text-center max-w-xs">{userProfile.bio}</p>}
@@ -291,8 +301,16 @@ export function UserPage() {
                                 </button>
                             )}
 
+                            <div className="relative z-20 flex justify-between pt-4 ">
+                                {auth.token && isOwnProfile && (
+                                    <Link href={`/settings`} className="btn bg-neutral-900 rounded-xl font-light opacity-80 hover:opacity-100 hover:bg-neutral-800 transition-opacity">
+                                        Редактировать
+                                    </Link>
+                                )}
+                            </div>
+
                             {currentUserProfile && (
-                                <div className="grid grid-cols-2 gap-4 mt-8 w-full">
+                                <div className="grid grid-cols-2 gap-4 mt-4 w-full">
                                     <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
                                         <p className="text-xl font-bold text-white">{currentUserProfile.stats.total_likes}</p>
                                         <p className="text-[10px] uppercase text-neutral-500">Лайков</p>

@@ -15,8 +15,6 @@ export function ImageEditPage() {
     const router = useRouter();
     const auth = useAuth();
     
-    console.log(id)
-
     const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (
         url: string,
         options?: RequestInit
