@@ -176,6 +176,7 @@ export function UserPage() {
         );
     }
 
+
     return (
         <main className="flex w-screen min-h-screen bg-neutral-900 text-neutral-200">
             <div className="flex w-full flex-col">
@@ -273,7 +274,8 @@ export function UserPage() {
                     <div className="w-full lg:w-96 bg-neutral-900 border-l border-neutral-800">
                         <div className="w-full flex flex-col items-center justify-center pt-10 px-4">
                             <div className="relative">
-                                <Image src={userProfile.avatar || "/img/nacho.png"} width={128} height={128} alt={userProfile.username} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
+                                {/* !!! */}
+                                <Image src={userProfile.profile.avatar  || "/img/nacho.png"} width={128} height={128} alt={userProfile.username} loading="eager" preload={true} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
                             </div>
                             <p className="text-2xl font-mono mt-4 text-white">{userProfile.username}</p>
                             {userProfile.bio && <p className="text-sm text-neutral-300 mt-2 text-center max-w-xs">{userProfile.bio}</p>}

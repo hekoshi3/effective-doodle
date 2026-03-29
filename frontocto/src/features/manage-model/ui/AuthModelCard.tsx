@@ -4,9 +4,7 @@ import Link from "next/link";
 
 export const AuthModelCard = ({ model, index }: ModelCardProps) => {
     const { user } = useAuth();
-    console.log(model.author.id)
     const isOwner = model.author.id === user?.id;
-
 
     return (
         <ModelCard model={model} statusBadge={isOwner && !model.is_published ?
