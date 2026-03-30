@@ -7,7 +7,19 @@ export interface User {
   last_name: string;
   bio: string;
   avatar: string;
-  banner: string;
+  profile: {
+    // !!!
+    id: number;
+    username: string;
+    profile: {
+      avatar: string | null;
+    };
+    avatar: string;
+    followers_count: number;
+    is_following: boolean;
+    banner: string;
+  };
+  
   stats: {
     total_downloads: number;
     total_likes: number;

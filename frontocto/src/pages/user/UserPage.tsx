@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
 
 import Image from "next/image";
@@ -92,6 +91,7 @@ export function UserPage() {
                     const userModels = modelsData.results.filter((model) => model.author.id === userData.id);
                     setModels(userModels.reverse());
                 }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 console.error("Error loading user data:", err);
                 setError(err.message || "Failed to load user data");
@@ -208,7 +208,7 @@ export function UserPage() {
                             {["images", "models", "analytics"].map((tab) => (
                                 <button
                                     key={tab}
-                                    onClick={() => setActiveTab(tab as any)}
+                                    onClick={() => setActiveTab(tab as SetStateAction<"images" | "models" | "analytics">)}
                                     className={`pb-2 px-4 font-semibold transition-colors capitalize ${activeTab === tab ? "text-white border-b-2 border-blue-500" : "text-neutral-400 hover:text-white"
                                         }`}
                                 >

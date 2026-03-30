@@ -186,8 +186,8 @@ export function ImageDetailPage() {
                                 <Image
                                     src={image.author.profile?.avatar || "/img/nacho.png"}
                                     alt={image.author.username}
-                                    width={56} height={56}
-                                    className="rounded-full border-2 border-neutral-600 group-hover:border-accent transition-all"
+                                    width={128} height={128}
+                                    className="rounded-full border-2 h-14 w-14 object-cover border-neutral-600 group-hover:border-accent transition-all"
                                 />
                                 <div>
                                     <h2 className="text-xl font-bold text-white group-hover:text-accent transition-colors">@{image.author.username}</h2>

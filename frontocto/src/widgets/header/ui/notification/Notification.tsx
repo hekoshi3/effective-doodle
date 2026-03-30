@@ -1,16 +1,74 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { useAuth } from "@/entities/user";
+import { Notif, NotificationList } from "@/entities/notification";
 
-interface NotificationProps {
-    unreadCount: number;
-    notifications?: ReactNode[];
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
 
-}
+export const NotificationBell = () => {
+    const auth = useAuth();
+    const [notifications, setNotifications] = useState<Notif[]>([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (url: string, options?: RequestInit) => Promise<Response>;
 
-export const NotificationBell = ( {unreadCount, notifications, }: NotificationProps) => {
+    const fetchNotifications = async () => {
+        if (!auth.token) return;
+        try {
+            const res = await makeAuthenticatedRequest(`${API_HOST}/notifications/`);
+            if (res.ok) {
+                const data: NotificationList = await res.json();
+                setNotifications(data.results);
+                setUnreadCount(data.results.filter(n => !n.is_read).length);
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    useEffect(() => {
+        fetchNotifications();
+        const interval = setInterval(fetchNotifications, 60000);
+        return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [auth.token]);
+
+    const markAsRead = async (e: React.MouseEvent, id: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+            const res = await makeAuthenticatedRequest(`${API_HOST}/notifications/${id}/`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ is_read: true }),
+            });
+            if (res.ok) {
+                setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+                setUnreadCount(prev => Math.max(0, prev - 1));
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const getNotificationLink = (n: Notif) => {
+        if (n.image) return `/image/${n.image}`;
+        if (n.aimodel) return `/model/${n.aimodel}`;
+        return `/user/${n.actor.username}`;
+    };
+
+    const getNotificationText = (n: Notif) => {
+        switch (n.type) {
+            case 'LIKE': return `liked your post`;
+            case 'COMMENT': return `commented on your post`;
+            case 'FOLLOW': return `started following you`;
+            case 'NEW_POST': return `published a new post`;
+            default: return `interacted with you`;
+        }
+    };
+
+    if (!auth.token) return null;
+
     return (
-        /* Используем details вместо div, чтобы контролировать закрытие */
         <details className="dropdown dropdown-end">
             <summary className="cursor-pointer bg-transparent list-none">
                 <div className="indicator">
@@ -23,8 +81,7 @@ export const NotificationBell = ( {unreadCount, notifications, }: NotificationPr
                 </div>
             </summary>
             
-            {/* flex-col гарантирует вертикальный список */}
-            <ul className="dropdown-content z-[100] mt-3 p-2 shadow-2xl bg-neutral-800 border border-neutral-700 rounded-xl w-80 sm:w-96 flex flex-col gap-1 max-h-[500px] overflow-y-auto overflow-x-hidden">
+            <ul className="dropdown-content z-100 mt-3 p-2 shadow-2xl bg-neutral-800 border border-neutral-700 rounded-xl w-80 sm:w-96 flex flex-col gap-1 max-h-125 overflow-y-auto overflow-x-hidden">
                 <li className="p-3 border-b border-neutral-700 flex justify-between items-center sticky top-0 bg-neutral-800 z-10">
                     <span className="font-bold text-white">Notifications</span>
                     {unreadCount > 0 && (
@@ -38,19 +95,17 @@ export const NotificationBell = ( {unreadCount, notifications, }: NotificationPr
                     {notifications.length === 0 ? (
                         <div className="p-10 text-center text-sm text-neutral-500 italic">No notifications yet</div>
                     ) : (
-                        notifications.map((n) => (
+                        notifications.map((n) => ( console.log(n),
                             <li key={n.id} className={`flex flex-col w-full border-b border-neutral-700/30 last:border-0 ${!n.is_read ? 'bg-accent/5' : ''}`}>
                                 <div className="p-4 flex items-start gap-3 w-full relative">
-                                    {/* Аватар */}
-                                    <Link href={`/user/${n.actor.username}`} className="flex-shrink-0">
+                                    <Link href={`/user/${n.actor.username}`} className="shrink-0">
                                         <Image 
-                                            src={n.actor.profile?.avatar || "/img/nacho.png"} 
-                                            alt="" width={40} height={40} 
-                                            className="rounded-full border border-neutral-600"
+                                            src={n.actor.profile.avatar || "/img/nacho.png"} 
+                                            alt="" width={40} height={40}
+                                            className="rounded-full border h-10 w-10 object-cover border-neutral-600"
                                         />
                                     </Link>
 
-                                    {/* Текст уведомления */}
                                     <div className="flex-1 flex flex-col gap-0.5 min-w-0">
                                         <div className="text-sm leading-tight text-neutral-200">
                                             <Link href={`/user/${n.actor.username}`} className="font-bold text-white hover:text-accent mr-1">
@@ -65,11 +120,10 @@ export const NotificationBell = ( {unreadCount, notifications, }: NotificationPr
                                         </span>
                                     </div>
 
-                                    {/* Кнопка прочитано */}
                                     {!n.is_read && (
                                         <button 
                                             onClick={(e) => markAsRead(e, n.id)}
-                                            className="flex-shrink-0 w-6 h-6 rounded-full bg-neutral-700 hover:bg-accent hover:text-black flex items-center justify-center transition-all shadow-lg"
+                                            className="shrink-0 w-6 h-6 rounded-full bg-neutral-700 hover:bg-accent hover:text-black flex items-center justify-center transition-all shadow-lg"
                                             title="Mark as read"
                                         >
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NavbarSearch } from "..";
 import { useAuth } from "@/entities/user";
+import { NotificationBell } from "./notification";
 
 export const Header = () => {
   const { token, logout, isLoading } = useAuth();
@@ -41,7 +42,7 @@ export const Header = () => {
                   <li><Link href={"/upload/model"}>Модель</Link></li>
                 </ul>
               </details>
-              {/*<NotificationBell></NotificationBell>*/}
+              <NotificationBell></NotificationBell>
               <Link href="/user" className="hover:underline">
                 User
               </Link>

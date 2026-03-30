@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const error = await response.json();
         throw new Error(error.detail || "Login failed");
       }
-
+      
       const data = await response.json();
       const { access, refresh } = data;
 
