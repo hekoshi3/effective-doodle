@@ -55,3 +55,9 @@ export interface GenParams {
   denoising_strength: string;
   cache_fp16_weight_for_lora: string;
 }
+
+export interface GenerationResponse {
+    images: string[];
+    parameters: Record<string, string>;
+    info: string;
+}

@@ -1,0 +1,1 @@
+export { sendGeneratePost } from "./SendPost"
