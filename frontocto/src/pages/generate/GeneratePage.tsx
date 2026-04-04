@@ -1,11 +1,11 @@
 "use client"
 
-import { GalleryImage } from "@/entities/AIimage";
+import "./static/GeneratePage.css"
 import { sendGeneratePost } from "@/features/generate";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
-export default function GeneratePage() {
+export function GeneratePage() {
   const [upprompt, setUpPrompt] = useState('');
   const [downprompt, setDownPrompt] = useState('');
   const [imgWidth, setImgWidth] = useState<number>(0);
@@ -13,75 +13,42 @@ export default function GeneratePage() {
   const [genSteps, setGenSteps] = useState<number>(0);
   const [genCfg, setGenCfg] = useState<number>(0.0);
   const [error, setError] = useState('');
-  const [MainImagePath, setMainImagePath] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [gallery, setGallery] = useState<GalleryImage[]>([]);
-  //const apiHost = process.env.NEXT_PUBLIC_API_HOST;
+  const [imgUrl, setImgUrl] = useState<string>('');
 
   useEffect(() => {
-    const fetchGallery = async () => {
-      try {
-        const res = await fetch("/api/scan");
-        if (!res.ok) throw new Error("Failed to fetch images");
-        const images: GalleryImage[] = await res.json();
-        setGallery(images.reverse());
-      } catch (error) {
-        console.error("Error loading gallery:", error);
+    return () => {
+      if (imgUrl && imgUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(imgUrl); // 
+        console.log("Memory cleaned up")
       }
-    };
-
-    fetchGallery();
-  }, []);
+    }
+  }, [imgUrl])
 
   const generate = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsGenerating(true);
+    setError("")
 
-    const gen_response = await sendGeneratePost(
-      upprompt,
-      downprompt,
-      imgWidth || 832,
-      imgHeight || 1216,
-      genSteps || 20,
-      genCfg || 4.0,
-      setError
-    );
+    try {
+      const gen_response = await sendGeneratePost(
+        upprompt,
+        downprompt,
+        imgWidth || 832,
+        imgHeight || 1216,
+        genSteps || 20,
+        genCfg || 4.0,
+        setError
+      );
 
-    const base64_image = gen_response.images[0];
-
-    const response = await fetch('/api/save-on-server', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        base_image: base64_image,
-        parameters: gen_response.info,
-      }),
-    });
-
-    if (gen_response.parameters.width) {
-      setImgWidth(parseInt(gen_response.parameters.width))
-    }
-    if (gen_response.parameters.height) {
-      setImgHeight(parseInt(gen_response.parameters.height))
-    }
-
-    const image_path = await response.json();
-    /*if (image_path.path) {
-      setMainImagePath(image_path.path);
-      setGallery(prev => [
-        {
-          image: image_path.path,
-          width: parseInt(gen_response.parameters.width),
-          height: parseInt(gen_response.parameters.height),
-        },
-        ...prev
-      ]);
-    } else {
-      console.log(image_path);
-    }*/
-    setIsGenerating(false);
-  };
-
+      if (gen_response?.bufferImage) {
+        const url = URL.createObjectURL(gen_response.bufferImage)
+        setImgUrl(url)
+      }
+    } catch (e) {
+      setError("Something went wrong: " + e)
+    } finally { setIsGenerating(false) }
+  }
   return (
     <>
       <div className="main-container">
@@ -142,42 +109,32 @@ export default function GeneratePage() {
               step="any"
               onChange={(e) => setGenCfg(parseInt(e.target.value))}
             />
-            <button type="submit" className="btn" disabled={isGenerating}>
-              {isGenerating ? 'Generating...' : 'Generate'}
-            </button>
+            <div>
+              <button type="submit" className="btn bg-neutral-950" disabled={isGenerating}>
+                {isGenerating ? 'Generating...' : 'Generate'}
+              </button>
+            </div>
           </form>
-
+          <div className="pt-20">
+            <button type="submit" className="btn bg-neutral-950" disabled={isGenerating || !imgUrl}>
+              {imgUrl ? 'Send to draft' : 'Waiting for an image'}
+            </button>
+          </div>
           {error && <p className="error">{error}</p>}
         </div>
 
-        <div className="column center-column">
-          {MainImagePath && (
+        <div className="column center-column justify-center items-center flex w-full">
+          {imgUrl && (
             <Image
-              src={MainImagePath}
+              src={imgUrl}
               alt="Generated"
               width={imgWidth}
               height={imgHeight}
-              style={{ maxWidth: "90%", height: "auto" }}
+              style={{ maxHeight: "90%", width: "auto" }}
+              className=""
               unoptimized
             />
           )}
-        </div>
-        <div className="column right-column">
-          <div className="gallery-list gallery">
-            {gallery.map((img, index) => (
-              <a key={index} href={img.path} target="_blank" rel="noopener noreferrer">
-                <div className="gallery-image-wrapper">
-                  <Image
-                    src={img.path}
-                    alt={`Generated ${index}`}
-                    width={190}
-                    height={Math.round(190 * (img.height / img.width))}
-                    unoptimized
-                  />
-                </div>
-              </a>
-            ))}
-          </div>
         </div>
       </div>
     </>

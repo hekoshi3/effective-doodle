@@ -1,9 +1,8 @@
 import { GenerationResponse } from "@/entities/AIimage";
 
 export async function sendGeneratePost(prompt: string, nprompt: string, inp_width: number, inp_height: number, steps: number, cfg_scale: number, setError: React.Dispatch<React.SetStateAction<string>>) {
-    const genHost = process.env.NEXT_PUBLIC_API_HOST;
+    const genHost = process.env.NEXT_PUBLIC_GEN_API;
     
-    // eslint-disable-next-line no-async-promise-executor
     return new Promise<GenerationResponse>(async (base) => {
         if ((prompt == "") || (undefined) || (!prompt)) {
             prompt = //"1girl, skinny, keqing \\(genshin impact\\),(ame929:0.56),(anna (drw01):0.4),(mignon:0.8),(amashiro natsuki:0.8),(dokuro deluxe:0.5),
@@ -34,7 +33,7 @@ export async function sendGeneratePost(prompt: string, nprompt: string, inp_widt
                 "height": inp_height
             });
         try {
-            const response = await fetch(genHost + '/generate', {//'/sdapi/v1/txt2img', {
+            const response = await fetch(genHost + '/sdapi/v1/txt2img', {//'/generate', {//'/sdapi/v1/txt2img', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,8 +41,13 @@ export async function sendGeneratePost(prompt: string, nprompt: string, inp_widt
                 body: req,
             });
 
-            const gen_response = await response.json();
-            base(gen_response);
+            const gen_response: GenerationResponse = await response.json();
+
+            const buffer = Buffer.from(gen_response.images[0], "base64")
+            const file = new File([buffer], Date.now().toString()+".png", { type: "image/png"})
+
+            const new_genres: GenerationResponse = { bufferImage: file, images: gen_response.images, parameters: gen_response.parameters, info: gen_response.info }
+            base(new_genres);
         } catch (err) {
             setError('An error occurred.'+err);
         }

@@ -1,0 +1,1 @@
+export { GeneratePage as default} from "@/pages/generate";

@@ -56,7 +56,14 @@ export interface GenParams {
   cache_fp16_weight_for_lora: string;
 }
 
+export interface API_Host_Response {
+    images: string[];
+    parameters: Record<string, string>;
+    info: string;
+}
+
 export interface GenerationResponse {
+    bufferImage: Blob;
     images: string[];
     parameters: Record<string, string>;
     info: string;
