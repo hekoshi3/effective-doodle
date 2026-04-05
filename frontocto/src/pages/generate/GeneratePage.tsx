@@ -1,24 +1,43 @@
 "use client"
 
+import { useAuth } from "@/entities/user";
 import { sendGeneratePost } from "@/features/generate";
+import { useUploadToDraft } from "@/features/upload";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export function GeneratePage() {
+  const auth = useAuth();
+  const router = useRouter();
+  const { upload } = useUploadToDraft();
+
   const [upprompt, setUpPrompt] = useState('');
   const [downprompt, setDownPrompt] = useState('');
-  const [imgWidth, setImgWidth] = useState<number>(0);
-  const [imgHeight, setImgHeight] = useState<number>(0);
-  const [genSteps, setGenSteps] = useState<number>(0);
-  const [genCfg, setGenCfg] = useState<number>(0.0);
+  const [imgWidth, setImgWidth] = useState<number>(832);
+  const [imgHeight, setImgHeight] = useState<number>(1216);
+  const [genSteps, setGenSteps] = useState<number>(20);
+  const [genCfg, setGenCfg] = useState<number>(4.0);
   const [error, setError] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false); 
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [imgUrl, setImgUrl] = useState<string>('');
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null)
+
+  useEffect(() => {
+    if (auth.isLoading) return;
+    if (!auth.token) {
+      router.push("/login");
+      return;
+    }
+    setIsLoading(false);
+  }, [auth.token, auth.isLoading, router]);
 
   useEffect(() => {
     return () => {
       if (imgUrl && imgUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(imgUrl); // 
+        URL.revokeObjectURL(imgUrl);
         console.log("Memory cleaned up")
       }
     }
@@ -41,6 +60,7 @@ export function GeneratePage() {
       );
 
       if (gen_response?.bufferImage) {
+        setImageBlob(gen_response?.bufferImage)
         const url = URL.createObjectURL(gen_response.bufferImage)
         setImgUrl(url)
       }
@@ -48,6 +68,37 @@ export function GeneratePage() {
       setError("Something went wrong: " + e)
     } finally { setIsGenerating(false) }
   }
+
+  const handleUpload = async () => {
+    if (!imageBlob) return;
+    if (isUploading) return;
+
+    setIsUploading(true);
+    setError("")
+
+    try {
+      const form = new FormData();
+
+      form.append("image", imageBlob, Date.now().toString() + ".png");
+
+      const imageId = await upload(form)
+      if (imageId) { router.push(`/image/edit/${imageId}`); }
+
+    } catch (e) {
+      console.error("Redirect error:", e); alert("Upload successful, but failed to redirect. Check console.");
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-neutral-900">
+        <span className="loading loading-ring loading-xl text-accent"></span>
+      </main>
+    );
+  }
+
   return (
     <>
       <div className="flex h-[95vh] gap-4 p-4">
@@ -119,13 +170,13 @@ export function GeneratePage() {
               </div>
             </div>
             <div>
-              <button type="submit" className="btn btn-neutral bg-neutral-900 border-0 outline-0" disabled={isGenerating}>
+              <button type="submit" className="btn btn-neutral bg-neutral-800 border-0 outline-0" disabled={isGenerating}>
                 {isGenerating ? 'Generating...' : 'Generate'}
               </button>
             </div>
           </form>
           <div className="absolute bottom-11">
-            <button type="submit" className="btn btn-neutral bg-neutral-800 border-0 " disabled={isGenerating || !imgUrl}>
+            <button type="button" className="btn btn-neutral bg-neutral-800 border-0 " disabled={isGenerating || !imgUrl} onClick={handleUpload}>
               {imgUrl ? 'Send to draft' : 'Waiting for an image'}
             </button>
           </div>
@@ -134,18 +185,18 @@ export function GeneratePage() {
 
         <div className="flex-col min-w-[33%] p-4 box-border rounded-lg h-[90vh] overflow-hidden center-column justify-center items-center flex w-full bg-neutral-900">
           {imgUrl && (
-              <Image
-                src={imgUrl}
-                alt="Generated"
-                width={imgWidth}
-                height={imgHeight}
-                style={{ maxHeight: "90%", width: "auto" }}
-                className="rounded-xl"
-                unoptimized
-              />
-            )}
-          </div>
+            <Image
+              src={imgUrl}
+              alt="Generated"
+              width={imgWidth}
+              height={imgHeight}
+              style={{ maxHeight: "90%", width: "auto" }}
+              className="rounded-xl"
+              unoptimized
+            />
+          )}
         </div>
+      </div>
     </>
   );
 }

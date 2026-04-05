@@ -4,13 +4,13 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/entities/user";
-
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+import { useUploadToDraft } from "@/features/upload";
 
 export function ImageUploadPage() {
     const router = useRouter();
     const auth = useAuth();
-    const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (url: string, options?: RequestInit) => Promise<Response>;
+
+    const { upload } = useUploadToDraft();
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,31 +43,13 @@ export function ImageUploadPage() {
         setIsSubmitting(true);
         const form = new FormData();
         form.append("image", selectedImage);
-
         try {
-            const res = await makeAuthenticatedRequest(`${API_HOST}/images/`, {
-                method: "POST",
-                body: form,
-            });
-
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                console.error("Server error:", errorData);
-                throw new Error("Upload failed");
+            const imageId = await upload(form);
+            if (imageId) {
+                router.push(`/image/edit/${imageId}`);
             }
-
-            const data = await res.json();
-
-            if (data && data.id) {
-                router.push(`/image/edit/${data.id}`);
-            } else {
-                console.error("ID not found in response:", data);
-                throw new Error("Server did not return image ID");
-            }
-
         } catch (e) {
-            console.error("Redirect error:", e);
-            alert("Upload successful, but failed to redirect. Check console.");
+            console.error("Redirect error:", e); alert("Upload successful, but failed to redirect. Check console.");
         } finally {
             setIsSubmitting(false);
         }

@@ -32,7 +32,7 @@ export const Header = () => {
         <section className="flex space-x-6 items-center">
           {token && (
             <>
-              <Link href="/" className="hover:underline">
+              <Link href="/generate" className="hover:underline">
                 Generate
               </Link>
               <details className="dropdown">
