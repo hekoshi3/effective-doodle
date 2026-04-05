@@ -1,6 +1,5 @@
 "use client"
 
-import "./static/GeneratePage.css"
 import { sendGeneratePost } from "@/features/generate";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -13,7 +12,7 @@ export function GeneratePage() {
   const [genSteps, setGenSteps] = useState<number>(0);
   const [genCfg, setGenCfg] = useState<number>(0.0);
   const [error, setError] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false); 
   const [imgUrl, setImgUrl] = useState<string>('');
 
   useEffect(() => {
@@ -51,92 +50,102 @@ export function GeneratePage() {
   }
   return (
     <>
-      <div className="main-container">
-        <div className="column left-column">
-          <form onSubmit={generate}>
+      <div className="flex h-[95vh] gap-4 p-4">
+        <div className="flex-col min-w-xl p-4 box-border rounded-lg h-[90vh] overflow-hidden bg-neutral-900">
+          <form onSubmit={generate} className="w-full">
             <textarea
-              id="up-p"
+              //id="up-p"
               name="up-prompt"
-              className="text_input prompt"
+              className="rounded-sm bg-[#222] w-full h-37.5 px-3 py-5 box-border resize-none "
               placeholder="Prompt"
               onChange={(e) => setUpPrompt(e.target.value)}>
             </textarea>
             <textarea
-              id="down-p"
+              //id="down-p"
               name="down-prompt"
-              className="text_input prompt"
+              className="rounded-sm bg-[#222] w-full h-37.5 px-3 py-5 box-border resize-none"
               placeholder="Negative Prompt"
               onChange={(e) => setDownPrompt(e.target.value)}
             />
-            <div className="resolution_box">
-              <input
-                type="number"
-                id="width_input"
-                name="width_input"
-                className="text_input resolution"
-                placeholder="Width"
-                defaultValue={832}
-                onChange={(e) => setImgWidth(parseInt(e.target.value))}
-              />
-              <input
-                type="number"
-                id="height_input"
-                name="height_input"
-                className="text_input resolution"
-                placeholder="Height"
-                defaultValue={1216}
-                onChange={(e) => setImgHeight(parseInt(e.target.value))}
-              />
+            <div className="flex gap-3">
+              <div className="">
+                <p>Resolution</p>
+                <div className="flex justify-between">
+                  <input
+                    type="number"
+                    //id="width_input"
+                    name="width_input"
+                    className="rounded-sm bg-[#222] w-1/3 px-3 py-1 box-border resize-none"
+                    placeholder="Width"
+                    defaultValue={832}
+                    onChange={(e) => setImgWidth(parseInt(e.target.value))}
+                  />
+                  <p>x</p>
+                  <input
+                    type="number"
+                    //id="height_input"
+                    name="height_input"
+                    className="rounded-sm bg-[#222] w-1/3 px-3 py-1 box-border resize-none"
+                    placeholder="Height"
+                    defaultValue={1216}
+                    onChange={(e) => setImgHeight(parseInt(e.target.value))}
+                  />
+                </div>
+              </div>
+              <div className="">
+                <p>Steps</p>
+                <input
+                  type="number"
+                  //id="steps_input"
+                  name="steps_input"
+                  className="rounded-sm bg-[#222] px-3 py-1 mb-1 box-border resize-none"
+                  placeholder="Steps"
+                  defaultValue={20}
+                  onChange={(e) => setGenSteps(parseInt(e.target.value))}
+                />
+                <p>CFG</p>
+                <input
+                  type="number"
+                  //id="cfg_input"
+                  name="cfg_input"
+                  className="rounded-sm bg-[#222] px-3 py-1 box-border resize-none"
+                  placeholder="CGF Scale"
+                  defaultValue={4.5}
+                  min={0}
+                  max={10}
+                  step="any"
+                  onChange={(e) => setGenCfg(parseInt(e.target.value))}
+                />
+              </div>
             </div>
-            <input
-              type="number"
-              id="steps_input"
-              name="steps_input"
-              className="text_input"
-              placeholder="Steps"
-              defaultValue={20}
-              onChange={(e) => setGenSteps(parseInt(e.target.value))}
-            />
-            <input
-              type="number"
-              id="cfg_input"
-              name="cfg_input"
-              className="text_input"
-              placeholder="CGF Scale"
-              defaultValue={4.5}
-              min={0}
-              max={10}
-              step="any"
-              onChange={(e) => setGenCfg(parseInt(e.target.value))}
-            />
             <div>
-              <button type="submit" className="btn bg-neutral-950" disabled={isGenerating}>
+              <button type="submit" className="btn btn-neutral bg-neutral-900 border-0 outline-0" disabled={isGenerating}>
                 {isGenerating ? 'Generating...' : 'Generate'}
               </button>
             </div>
           </form>
-          <div className="pt-20">
-            <button type="submit" className="btn bg-neutral-950" disabled={isGenerating || !imgUrl}>
+          <div className="absolute bottom-11">
+            <button type="submit" className="btn btn-neutral bg-neutral-800 border-0 " disabled={isGenerating || !imgUrl}>
               {imgUrl ? 'Send to draft' : 'Waiting for an image'}
             </button>
           </div>
           {error && <p className="error">{error}</p>}
         </div>
 
-        <div className="column center-column justify-center items-center flex w-full">
+        <div className="flex-col min-w-[33%] p-4 box-border rounded-lg h-[90vh] overflow-hidden center-column justify-center items-center flex w-full bg-neutral-900">
           {imgUrl && (
-            <Image
-              src={imgUrl}
-              alt="Generated"
-              width={imgWidth}
-              height={imgHeight}
-              style={{ maxHeight: "90%", width: "auto" }}
-              className=""
-              unoptimized
-            />
-          )}
+              <Image
+                src={imgUrl}
+                alt="Generated"
+                width={imgWidth}
+                height={imgHeight}
+                style={{ maxHeight: "90%", width: "auto" }}
+                className="rounded-xl"
+                unoptimized
+              />
+            )}
+          </div>
         </div>
-      </div>
     </>
   );
 }
