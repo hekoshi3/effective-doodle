@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { notFound, useParams } from "next/navigation";
 
 import Image from "next/image";
@@ -27,11 +27,13 @@ export function UserPage() {
     const [models, setModels] = useState<Model[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isFollowing, setIsFollowing] = useState<boolean>(false);
     const [isUpdatingFollow, setIsUpdatingFollow] = useState(false);
     const [activeTab, setActiveTab] = useState<"images" | "models" | "analytics">("images");
     const [isOwnProfile, setIsOwnProfile] = useState<boolean>(false);
     const [, setCurrentUsername] = useState<string | null>(null);
+    const [optimisticFollow, setOptimisticFollow] = useState<boolean | null>(null);
+    const [optimisticCount, setOptimisticCount] = useState<number | null>(null);
+    const pendingFollowRef = useRef<boolean | null>(null);
 
     useEffect(() => {
         if (!username || auth.isLoading) return;
@@ -49,7 +51,6 @@ export function UserPage() {
 
                 const userData: User = await userRes.json();
                 setUserProfile(userData);
-                setIsFollowing(userData.is_following || false);
 
                 const analyticsRes = auth.token
                     ? await makeAuthenticatedRequest(`${API_HOST}/users/analytics/`)
@@ -91,7 +92,7 @@ export function UserPage() {
                     const userModels = modelsData.results.filter((model) => model.author.id === userData.id);
                     setModels(userModels.reverse());
                 }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 console.error("Error loading user data:", err);
                 setError(err.message || "Failed to load user data");
@@ -103,29 +104,67 @@ export function UserPage() {
         fetchUserData();
     }, [username, auth.token, auth.isLoading, makeAuthenticatedRequest]);
 
-    const handleFollow = async () => {
+    useEffect(() => {
+        if (userProfile && userProfile.is_following === optimisticFollow) {
+            setOptimisticFollow(null)
+        }
+        if (userProfile && userProfile.followers_count === optimisticCount) {
+            setOptimisticCount(null)
+        }
+    }, [optimisticCount, optimisticFollow, userProfile, userProfile?.is_following, userProfile?.followers_count]);
+
+    const displayFollow = pendingFollowRef.current !== null
+        ? pendingFollowRef.current
+        : (optimisticFollow !== null
+            ? optimisticFollow
+            : (userProfile?.is_following ?? false));
+
+
+    const displayCount = optimisticCount !== null
+        ? optimisticCount
+        : (userProfile?.followers_count ?? 0)
+
+    const handleFollowClick = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         if (!auth.token || !userProfile || isUpdatingFollow) return;
+
         setIsUpdatingFollow(true);
+
+        const nextFollow = !displayFollow;
+        const nextCount = nextFollow ? displayCount + 1 : displayCount - 1
+
+        pendingFollowRef.current = nextFollow;
+        setIsUpdatingFollow(true);
+        setOptimisticCount(nextCount)
+        setOptimisticFollow(nextFollow);
+
         try {
-            const response = await makeAuthenticatedRequest(`${API_HOST}/follows/`, {
+            makeAuthenticatedRequest(`${API_HOST}/follows/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ following: userProfile.id }),
-            });
-            if (response.ok) {
-                setIsFollowing(!isFollowing);
-                setUserProfile(prev => prev ? {
-                    ...prev,
-                    followers_count: isFollowing ? prev.followers_count - 1 : prev.followers_count + 1,
-                    is_following: !isFollowing
-                } : null);
-            }
+            })
         } catch (error) {
-            console.error("Error toggling follow:", error);
+            console.error("Error updating: " + error)
+            setOptimisticCount(null)
+            setOptimisticFollow(null)
+            pendingFollowRef.current = null
         } finally {
-            setIsUpdatingFollow(false);
+            setTimeout(() => {
+                pendingFollowRef.current = null
+                setIsUpdatingFollow(false)
+            }, 200);
         }
     };
+
+    useEffect(() => {
+        if (userProfile) {
+            if (optimisticFollow === userProfile.is_following) setOptimisticFollow(null)
+            if (optimisticCount === userProfile.followers_count) setOptimisticCount(null)
+        }
+    },[optimisticCount, optimisticFollow, userProfile]);
 
     const ActivityGraph = ({ data }: { data: Analytics['activity_graph'] }) => {
         if (!data) return <p className="text-neutral-500">Нет данных для графика</p>;
@@ -289,15 +328,15 @@ export function UserPage() {
                             </div>
                             <p className="text-2xl font-mono mt-4 text-white">{userProfile.username}</p>
                             {userProfile.bio && <p className="text-sm text-neutral-300 mt-2 text-center max-w-xs">{userProfile.bio}</p>}
-                            <p className="text-sm font-extralight text-neutral-400 mt-2">{userProfile.followers_count} подписчиков</p>
+                            <p className="text-sm font-extralight text-neutral-400 mt-2">{displayCount} подписчиков</p>
 
                             {auth.token && !isOwnProfile && (
                                 <button
-                                    onClick={handleFollow}
+                                    onClick={handleFollowClick}
                                     disabled={isUpdatingFollow}
-                                    className={`mt-4 px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${isFollowing ? "bg-neutral-700 hover:bg-neutral-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
+                                    className={`mt-4 px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${displayFollow ? "bg-neutral-700 hover:bg-neutral-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
                                 >
-                                    {isUpdatingFollow ? "..." : isFollowing ? "Unfollow" : "Follow"}
+                                    {isUpdatingFollow ? "..." : displayFollow ? "Unfollow" : "Follow"}
                                 </button>
                             )}
 
