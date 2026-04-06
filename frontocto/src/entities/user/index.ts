@@ -1,2 +1,2 @@
-export type { User, Analytics, AuthContextType } from "./model"
-export { useAuth, AuthContext } from "./model"
+export type { User, Analytics, AuthContextType, userSideProps } from "./model"
+export { useAuth, AuthContext, useUserPageData } from "./model"

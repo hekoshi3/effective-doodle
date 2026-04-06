@@ -1,202 +1,43 @@
 "use client";
 
-import { SetStateAction, useEffect, useRef, useState } from "react";
-import { notFound, useParams } from "next/navigation";
-
+import { SetStateAction, useState } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { GalleryImage, BackdendResIMG } from "@/entities/AIimage";
-import { BackdendResMODEL, Model } from "@/entities/AImodel";
-import { useAuth, Analytics, User } from "@/entities/user";
+
+import { useAuth, Analytics } from "@/entities/user";
 import { AuthImageCard } from "@/features/manage-image";
 import { AuthModelCard } from "@/features/manage-model";
-
-
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+import { useUserPageData } from "@/entities/user";
+import { useToggleFollow } from "@/features/user";
+import { UserSidebar } from "@/widgets/user";
 
 export function UserPage() {
     const params = useParams();
     const username = params?.name as string;
     const auth = useAuth();
-    const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (url: string, options?: RequestInit) => Promise<Response>;
 
-    const [userProfile, setUserProfile] = useState<User | null>(null);
-    const [currentUserProfile, setCurUserProfile] = useState<User | null>(null);
-    const [analytics, setAnalytics] = useState<Analytics | null>(null);
-    const [gallery, setGallery] = useState<GalleryImage[]>([]);
-    const [models, setModels] = useState<Model[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [isUpdatingFollow, setIsUpdatingFollow] = useState(false);
     const [activeTab, setActiveTab] = useState<"images" | "models" | "analytics">("images");
-    const [isOwnProfile, setIsOwnProfile] = useState<boolean>(false);
-    const [, setCurrentUsername] = useState<string | null>(null);
-    const [optimisticFollow, setOptimisticFollow] = useState<boolean | null>(null);
-    const [optimisticCount, setOptimisticCount] = useState<number | null>(null);
-    const pendingFollowRef = useRef<boolean | null>(null);
 
-    useEffect(() => {
-        if (!username || auth.isLoading) return;
+    const {
+        userProfile,
+        currentUserProfile,
+        analytics,
+        gallery,
+        models,
+        isLoading,
+        error,
+        isOwnProfile,
+    } = useUserPageData(username, auth)
 
-        const fetchUserData = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
+    const {
+        displayFollow,
+        displayCount,
+        isUpdatingFollow,
+        toggleFollow,
+    } = useToggleFollow(userProfile, auth)
 
-                const userRes = auth.token
-                    ? await makeAuthenticatedRequest(`${API_HOST}/users/${username}/`)
-                    : await fetch(`${API_HOST}/users/${username}/`);
-
-                if (!userRes.ok) notFound();
-
-                const userData: User = await userRes.json();
-                setUserProfile(userData);
-
-                const analyticsRes = auth.token
-                    ? await makeAuthenticatedRequest(`${API_HOST}/users/analytics/`)
-                    : await fetch(`${API_HOST}/users/analytics/`);
-
-                if (analyticsRes.ok) {
-                    const analyticsData: Analytics = await analyticsRes.json();
-                    setAnalytics(analyticsData);
-                }
-
-                if (auth.token) {
-                    try {
-                        const meRes = await makeAuthenticatedRequest(`${API_HOST}/users/me/`);
-                        if (meRes.ok) {
-                            const meData = await meRes.json();
-                            setCurUserProfile(meData)
-                            setCurrentUsername(meData.username);
-                            setIsOwnProfile(meData.username === userData.username);
-                        }
-                    } catch { }
-                }
-
-                const imagesRes = auth.token
-                    ? await makeAuthenticatedRequest(`${API_HOST}/images/`)
-                    : await fetch(`${API_HOST}/images/`);
-
-                if (imagesRes.ok) {
-                    const imagesData: BackdendResIMG = await imagesRes.json();
-                    const userImages = imagesData.results.filter((img) => img.author.id === userData.id);
-                    setGallery(userImages.reverse());
-                }
-
-                const modelsRes = auth.token
-                    ? await makeAuthenticatedRequest(`${API_HOST}/models/`)
-                    : await fetch(`${API_HOST}/models/`);
-
-                if (modelsRes.ok) {
-                    const modelsData: BackdendResMODEL = await modelsRes.json();
-                    const userModels = modelsData.results.filter((model) => model.author.id === userData.id);
-                    setModels(userModels.reverse());
-                }
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (err: any) {
-                console.error("Error loading user data:", err);
-                setError(err.message || "Failed to load user data");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, [username, auth.token, auth.isLoading, makeAuthenticatedRequest]);
-
-    useEffect(() => {
-        if (userProfile && userProfile.is_following === optimisticFollow) {
-            setOptimisticFollow(null)
-        }
-        if (userProfile && userProfile.followers_count === optimisticCount) {
-            setOptimisticCount(null)
-        }
-    }, [optimisticCount, optimisticFollow, userProfile, userProfile?.is_following, userProfile?.followers_count]);
-
-    const displayFollow = pendingFollowRef.current !== null
-        ? pendingFollowRef.current
-        : (optimisticFollow !== null
-            ? optimisticFollow
-            : (userProfile?.is_following ?? false));
-
-
-    const displayCount = optimisticCount !== null
-        ? optimisticCount
-        : (userProfile?.followers_count ?? 0)
-
-    const handleFollowClick = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!auth.token || !userProfile || isUpdatingFollow) return;
-
-        setIsUpdatingFollow(true);
-
-        const nextFollow = !displayFollow;
-        const nextCount = nextFollow ? displayCount + 1 : displayCount - 1
-
-        pendingFollowRef.current = nextFollow;
-        setIsUpdatingFollow(true);
-        setOptimisticCount(nextCount)
-        setOptimisticFollow(nextFollow);
-
-        try {
-            makeAuthenticatedRequest(`${API_HOST}/follows/`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ following: userProfile.id }),
-            })
-        } catch (error) {
-            console.error("Error updating: " + error)
-            setOptimisticCount(null)
-            setOptimisticFollow(null)
-            pendingFollowRef.current = null
-        } finally {
-            setTimeout(() => {
-                pendingFollowRef.current = null
-                setIsUpdatingFollow(false)
-            }, 200);
-        }
-    };
-
-    useEffect(() => {
-        if (userProfile) {
-            if (optimisticFollow === userProfile.is_following) setOptimisticFollow(null)
-            if (optimisticCount === userProfile.followers_count) setOptimisticCount(null)
-        }
-    },[optimisticCount, optimisticFollow, userProfile]);
-
-    const ActivityGraph = ({ data }: { data: Analytics['activity_graph'] }) => {
-        if (!data) return <p className="text-neutral-500">Нет данных для графика</p>;
-        const maxCount = Math.max(...data.map(d => d.count), 1);
-        const height = 100;
-        const width = 400;
-        const step = width / (data.length - 1 || 1);
-
-        const points = data.map((d, i) => `${i * step},${height - (d.count / maxCount) * height}`).join(' ');
-
-        return (
-            <div className="w-full bg-neutral-800/50 p-4 rounded-xl border border-neutral-700">
-                <h3 className="text-sm font-semibold mb-4 text-neutral-300 uppercase tracking-wider">Активность за последнее время</h3>
-                <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-32 overflow-visible">
-                    <polyline
-                        fill="none"
-                        stroke="#3b82f6"
-                        strokeWidth="2"
-                        strokeLinejoin="round"
-                        points={points}
-                    />
-                    {data.map((d, i) => (
-                        <circle key={i} cx={i * step} cy={height - (d.count / maxCount) * height} r="3" fill="#3b82f6" className="hover:r-4 transition-all cursor-pointer" />
-                    ))}
-                </svg>
-                {/*<div className="flex justify-between mt-2 text-[10px] text-neutral-500">
-                    <span>{data[0].date ? data[0].date : "n/a"}</span>
-                    <span>{data[data.length-1].date ? data[data.length-1].date : "n/a"}</span>
-                </div>*/}
-            </div>
-        );
-    };
+    
 
     if (isLoading) {
         return (
@@ -320,58 +161,50 @@ export function UserPage() {
                         )}
                     </div>
 
-                    <div className="w-full lg:w-96 bg-neutral-900 border-l border-neutral-800">
-                        <div className="w-full flex flex-col items-center justify-center pt-10 px-4">
-                            <div className="relative">
-                                {/* !!! */}
-                                <Image src={userProfile.profile.avatar || "/img/nacho.png"} width={128} height={128} alt={userProfile.username} loading="eager" preload={true} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
-                            </div>
-                            <p className="text-2xl font-mono mt-4 text-white">{userProfile.username}</p>
-                            {userProfile.bio && <p className="text-sm text-neutral-300 mt-2 text-center max-w-xs">{userProfile.bio}</p>}
-                            <p className="text-sm font-extralight text-neutral-400 mt-2">{displayCount} подписчиков</p>
-
-                            {auth.token && !isOwnProfile && (
-                                <button
-                                    onClick={handleFollowClick}
-                                    disabled={isUpdatingFollow}
-                                    className={`mt-4 px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${displayFollow ? "bg-neutral-700 hover:bg-neutral-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
-                                >
-                                    {isUpdatingFollow ? "..." : displayFollow ? "Unfollow" : "Follow"}
-                                </button>
-                            )}
-
-                            <div className="relative z-20 flex justify-between pt-4 ">
-                                {auth.token && isOwnProfile && (
-                                    <Link href={`/settings`} className="btn bg-neutral-900 rounded-xl font-light opacity-80 hover:opacity-100 hover:bg-neutral-800 transition-opacity">
-                                        Редактировать
-                                    </Link>
-                                )}
-                            </div>
-
-                            {currentUserProfile && (
-                                <div className="grid grid-cols-2 gap-4 mt-4 w-full">
-                                    <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                        <p className="text-xl font-bold text-white">{currentUserProfile.stats.total_likes}</p>
-                                        <p className="text-[10px] uppercase text-neutral-500">Лайков</p>
-                                    </div>
-                                    <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                        <p className="text-xl font-bold text-white">{currentUserProfile.stats.total_downloads}</p>
-                                        <p className="text-[10px] uppercase text-neutral-500">Загрузок</p>
-                                    </div>
-                                    <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                        <p className="text-xl font-bold text-white">{currentUserProfile.stats.images_count}</p>
-                                        <p className="text-[10px] uppercase text-neutral-500">Изображений</p>
-                                    </div>
-                                    <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                        <p className="text-xl font-bold text-white">{currentUserProfile.stats.models_count}</p>
-                                        <p className="text-[10px] uppercase text-neutral-500">Моделей</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                    <UserSidebar
+                        userProfile={userProfile}
+                        displayCount={displayCount}
+                        displayFollow={displayFollow}
+                        toggleFollow={toggleFollow}
+                        auth={auth}
+                        isOwnProfile={isOwnProfile}
+                        isUpdatingFollow={isUpdatingFollow}
+                        currentUserProfile={currentUserProfile}>
+                    </UserSidebar>
                 </div>
             </div>
         </main>
     );
 }
+
+const ActivityGraph = ({ data }: { data: Analytics['activity_graph'] }) => {
+        if (!data) return <p className="text-neutral-500">Нет данных для графика</p>;
+        const maxCount = Math.max(...data.map(d => d.count), 1);
+        const height = 100;
+        const width = 400;
+        const step = width / (data.length - 1 || 1);
+
+        const points = data.map((d, i) => `${i * step},${height - (d.count / maxCount) * height}`).join(' ');
+
+        return (
+            <div className="w-full bg-neutral-800/50 p-4 rounded-xl border border-neutral-700">
+                <h3 className="text-sm font-semibold mb-4 text-neutral-300 uppercase tracking-wider">Активность за последнее время</h3>
+                <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-32 overflow-visible">
+                    <polyline
+                        fill="none"
+                        stroke="#3b82f6"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                        points={points}
+                    />
+                    {data.map((d, i) => (
+                        <circle key={i} cx={i * step} cy={height - (d.count / maxCount) * height} r="3" fill="#3b82f6" className="hover:r-4 transition-all cursor-pointer" />
+                    ))}
+                </svg>
+                <div className="flex justify-between mt-2 text-[10px] text-neutral-500">
+                    <span>{data[0].date ? data[0].date : "n/a"}</span>
+                    <span>{data[data.length - 1].date ? data[data.length - 1].date : "n/a"}</span>
+                </div>
+            </div>
+        );
+    };
