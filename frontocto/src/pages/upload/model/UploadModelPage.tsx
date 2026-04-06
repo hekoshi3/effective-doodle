@@ -32,7 +32,7 @@ export function ModelUploadPage() {
     useEffect(() => {
         if (auth.isLoading) return;
         if (!auth.token) {
-            router.push("/login");
+            router.push("/auth");
             return;
         }
         setIsLoading(false);

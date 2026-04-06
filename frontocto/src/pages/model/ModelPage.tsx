@@ -296,7 +296,7 @@ export function ModelDetailPage() {
                                 </form>
                             ) : (
                                 <div className="bg-neutral-800/50 border border-neutral-700 border-dashed p-6 rounded-xl text-center mb-8">
-                                    <p className="text-neutral-400 text-sm">Please <Link href="/login" className="text-accent hover:underline">login</Link> to leave a comment</p>
+                                    <p className="text-neutral-400 text-sm">Please <Link href="/auth" className="text-accent hover:underline">login</Link> to leave a comment</p>
                                 </div>
                             )}
 

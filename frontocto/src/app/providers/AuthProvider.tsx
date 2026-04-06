@@ -31,18 +31,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    const storedToken = sessionStorage.getItem("access_token");
-    const storedRefreshToken = sessionStorage.getItem("refresh_token");
-    const storedRole = sessionStorage.getItem("role");
+    const initAuth = async () => {
+      try {
+        const storedToken = sessionStorage.getItem("access_token");
+        const storedRefreshToken = sessionStorage.getItem("refresh_token");
+        const storedRole = sessionStorage.getItem("role");
 
-    if (storedToken) {
-      setToken_(storedToken);
-      setRefreshToken_(storedRefreshToken);
-      setRole(storedRole);
-      fetchMe(storedToken);
-    }
+        if (storedToken) {
+          setToken_(storedToken);
+          setRefreshToken_(storedRefreshToken);
+          setRole(storedRole);
 
-    setIsLoading(false);
+          await fetchMe(storedToken);
+        }
+      } catch (e) {
+        console.error("Auth failed: " + e)
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initAuth();
   }, []);
 
   const login = async (username: string, password: string) => {
@@ -57,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const error = await response.json();
         throw new Error(error.detail || "Login failed");
       }
-      
+
       const data = await response.json();
       const { access, refresh } = data;
 
@@ -65,9 +73,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       sessionStorage.setItem("refresh_token", refresh);
       setToken_(access);
       setRefreshToken_(refresh);
-      
+
       await fetchMe(access);
-      
+
       return { success: true };
     } catch (error) {
       console.error("Login error:", error);
