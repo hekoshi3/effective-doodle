@@ -1,163 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useAuth } from "@/entities/user";
-import { Model } from "@/entities/AImodel";
-
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+import { useGetTags } from "@/entities/tag";
+import { useTags } from "@/entities/tag";
+import { useManageModel } from "@/features/upload";
 
 export function ModelEditPage() {
+    const router = useRouter();
     const params = useParams();
     const id = params?.id
-    const router = useRouter();
-    const auth = useAuth();
-
-    const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (
-        url: string,
-        options?: RequestInit
-    ) => Promise<Response>;
-
-    const [modelData, setModelData] = useState<Model | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [tags, setTags] = useState<string[]>([]);
-
-    const [allTags, setAllTags] = useState<string[]>([]);
-    const [tagInput, setTagInput] = useState("");
-
-    const [isSaving, setIsSaving] = useState(false);
-    const [isPublishing, setIsPublishing] = useState(false);
-
-    useEffect(() => {
-        if (!id || auth.isLoading) return;
-
-        const loadModel = async () => {
-            try {
-                setIsLoading(true);
-                const res = auth.token
-                    ? await makeAuthenticatedRequest(`${API_HOST}/models/${id}/`)
-                    : await fetch(`${API_HOST}/models/${id}/`);
-
-                if (!res.ok) throw new Error("Failed to load model");
-
-                const data = await res.json();
-                setModelData(data);
-                setName(data.name || "");
-                setDescription(data.description || "");
-
-                if (Array.isArray(data.tags)) {
-                    setTags(data.tags.map((t: any) => typeof t === "string" ? t : t.name));
-                }
-            } catch (e: any) {
-                setError(e.message || "Error loading model");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadModel();
-    }, [id, auth.token, auth.isLoading, makeAuthenticatedRequest]);
-
-    useEffect(() => {
-        fetch(`${API_HOST}/tags/`)
-            .then((r) => (r.ok ? r.json() : []))
-            .then((data) => {
-                if (Array.isArray(data)) {
-                    setAllTags(data.map((t: any) => typeof t === "string" ? t : t.name));
-                }
-            })
-            .catch(() => {});
-    }, []);
-
-    const suggestions =
-        tagInput.trim() === ""
-            ? []
-            : allTags
-                  .filter(
-                      (t) =>
-                          t.toLowerCase().includes(tagInput.toLowerCase()) &&
-                          !tags.includes(t)
-                  )
-                  .slice(0, 8);
-
-    const addTag = (value: string) => {
-        const clean = value.replace(/,/g, "").trim();
-        if (!clean || tags.includes(clean)) {
-            setTagInput("");
-            return;
-        }
-        setTags((prev) => [...prev, clean]);
-        setTagInput("");
-    };
-
-    const removeTag = (tag: string) => {
-        setTags((prev) => prev.filter((t) => t !== tag));
-    };
-
-    const handleSaveDraft = async () => {
-        if (!auth.token || !modelData) return;
-
-        setIsSaving(true);
-        try {
-            const res = await makeAuthenticatedRequest(
-                `${API_HOST}/models/${modelData.id}/`,
-                {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name,
-                        description,
-                        tags,
-                    }),
-                }
-            );
-
-            if (!res.ok) throw new Error("Failed to save");
-            const updated = await res.json();
-            setModelData(updated);
-            if (updated.tags) {
-                setTags(updated.tags.map((t: any) => typeof t === "string" ? t : t.name));
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handlePublish = async () => {
-        if (!auth.token || !modelData) return;
-
-        setIsPublishing(true);
-        try {
-            const res = await makeAuthenticatedRequest(
-                `${API_HOST}/models/${modelData.id}/`,
-                {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        is_published: true,
-                        name,
-                        description,
-                        tags 
-                    }),
-                }
-            );
-
-            if (!res.ok) throw new Error("Publish failed");
-            router.push(`/model/${modelData.id}`);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setIsPublishing(false);
-        }
-    };
+    const { allTags } = useGetTags()
+    const { addTag, removeTag, tagSuggestions, tags, setTags, tagInput, setTagInput } = useTags(allTags) // !!! change to callback
+    const {
+        handleSaveDraft,
+        handlePublish,
+        isPublishing,
+        isSaving,
+        isLoading,
+        error,
+        modelData,
+        name,
+        description,
+        setName,
+        setDescription } = useManageModel(id, setTags, tags)
 
     if (isLoading) return <main className="flex min-h-screen items-center justify-center bg-neutral-900"><span className="loading loading-ring loading-xl text-accent"></span></main>;
     if (error || !modelData) return <main className="flex min-h-screen items-center justify-center bg-neutral-900 text-red-400">{error || "Model not found"}</main>;
@@ -186,7 +52,7 @@ export function ModelEditPage() {
 
                     <div className="flex flex-col gap-6">
                         <h1 className="text-2xl font-bold text-accent">Finalize Your Model</h1>
-                        
+
                         <div>
                             <label className="text-sm text-neutral-400 block mb-1">Model Name</label>
                             <input
@@ -224,9 +90,9 @@ export function ModelEditPage() {
                                 className="w-full bg-neutral-800 text-white rounded-lg p-3 border border-neutral-700 focus:border-accent outline-none"
                             />
 
-                            {suggestions.length > 0 && (
+                            {tagSuggestions.length > 0 && (
                                 <div className="absolute z-20 w-full bg-neutral-800 border border-neutral-700 rounded-lg mt-1 shadow-2xl overflow-hidden">
-                                    {suggestions.map((t) => (
+                                    {tagSuggestions.map((t) => (
                                         <button
                                             key={t}
                                             type="button"
@@ -243,8 +109,8 @@ export function ModelEditPage() {
                                 {tags.map((t) => (
                                     <span key={t} className="flex items-center gap-1 bg-accent/20 text-accent border border-accent/30 px-3 py-1 rounded-full text-sm">
                                         #{t}
-                                        <button 
-                                            type="button" 
+                                        <button
+                                            type="button"
                                             onClick={() => removeTag(t)}
                                             className="hover:text-white ml-1 font-bold"
                                         >
