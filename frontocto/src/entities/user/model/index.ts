@@ -1,5 +1,7 @@
-export { useAuth, AuthContext } from "./use-auth"
-export {useUserPageData} from "./useUserPageData"
-export type * from "./userSideProps.types"
-export type * from "./user.types"
-export type * from "./auth.types" 
+export { useAuth, AuthContext } from "./use-auth";
+export { useUserPageData } from "./useUserPageData";
+export { usePushToLogin } from "./usePushToLogin";
+
+export type * from "./userSideProps.types";
+export type * from "./user.types";
+export type * from "./auth.types";

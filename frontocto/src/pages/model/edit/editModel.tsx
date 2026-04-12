@@ -5,13 +5,26 @@ import Image from "next/image";
 import { useGetTags } from "@/entities/tag";
 import { useTags } from "@/entities/tag";
 import { useManageModel } from "@/features/upload";
+import { useCallback } from "react";
 
 export function ModelEditPage() {
     const router = useRouter();
     const params = useParams();
     const id = params?.id
     const { allTags } = useGetTags()
-    const { addTag, removeTag, tagSuggestions, tags, setTags, tagInput, setTagInput } = useTags(allTags) // !!! change to callback
+    const tagLogic = useTags(allTags)
+    const { setTags } = tagLogic
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleDataLoaded = useCallback((data: any) => {
+        if (data.tags) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const normalized = data.tags.map((t: any) => typeof t === "string" ? t : t.name);
+            setTags(normalized)
+        }
+    }, [setTags]
+    )
+
     const {
         handleSaveDraft,
         handlePublish,
@@ -23,7 +36,10 @@ export function ModelEditPage() {
         name,
         description,
         setName,
-        setDescription } = useManageModel(id, setTags, tags)
+        setDescription } = useManageModel(id, {
+            tags: tagLogic.tags,
+            onSuccess: handleDataLoaded
+        })
 
     if (isLoading) return <main className="flex min-h-screen items-center justify-center bg-neutral-900"><span className="loading loading-ring loading-xl text-accent"></span></main>;
     if (error || !modelData) return <main className="flex min-h-screen items-center justify-center bg-neutral-900 text-red-400">{error || "Model not found"}</main>;
@@ -78,25 +94,25 @@ export function ModelEditPage() {
                         <div className="relative">
                             <label className="text-sm text-neutral-400 block mb-1">Tags</label>
                             <input
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
+                                value={tagLogic.tagInput}
+                                onChange={(e) => tagLogic.setTagInput(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" || e.key === ",") {
                                         e.preventDefault();
-                                        addTag(tagInput);
+                                        tagLogic.addTag(tagLogic.tagInput);
                                     }
                                 }}
                                 placeholder="Add tags (style, character, etc)..."
                                 className="w-full bg-neutral-800 text-white rounded-lg p-3 border border-neutral-700 focus:border-accent outline-none"
                             />
 
-                            {tagSuggestions.length > 0 && (
+                            {tagLogic.tagSuggestions.length > 0 && (
                                 <div className="absolute z-20 w-full bg-neutral-800 border border-neutral-700 rounded-lg mt-1 shadow-2xl overflow-hidden">
-                                    {tagSuggestions.map((t) => (
+                                    {tagLogic.tagSuggestions.map((t) => (
                                         <button
                                             key={t}
                                             type="button"
-                                            onClick={() => addTag(t)}
+                                            onClick={() => tagLogic.addTag(t)}
                                             className="block w-full text-left px-4 py-2 hover:bg-neutral-700 transition-colors"
                                         >
                                             {t}
@@ -106,12 +122,12 @@ export function ModelEditPage() {
                             )}
 
                             <div className="flex flex-wrap gap-2 mt-4">
-                                {tags.map((t) => (
+                                {tagLogic.tags.map((t) => (
                                     <span key={t} className="flex items-center gap-1 bg-accent/20 text-accent border border-accent/30 px-3 py-1 rounded-full text-sm">
                                         #{t}
                                         <button
                                             type="button"
-                                            onClick={() => removeTag(t)}
+                                            onClick={() => tagLogic.removeTag(t)}
                                             className="hover:text-white ml-1 font-bold"
                                         >
                                             ×

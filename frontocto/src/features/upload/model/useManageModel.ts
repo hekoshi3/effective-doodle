@@ -1,20 +1,27 @@
-"use client"
+"use client";
 
 import { Model } from "@/entities/AImodel";
 import { useAuth } from "@/entities/user";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+const API_HOST =
+  process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
 
-export function useManageModel(id: string | string[] | undefined, setTags: Dispatch<SetStateAction<string[]>>, tags: string[]) {
+interface ManageModelConfig {
+  tags: string[];
+  onSuccess?: (data: Model) => void;
+}
+
+export function useManageModel(
+  id: string | string[] | undefined,
+  config: ManageModelConfig,
+) {
+  const { tags, onSuccess } = config;
   const auth = useAuth();
   const router = useRouter();
 
-  const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (
-    url: string,
-    options?: RequestInit,
-  ) => Promise<Response>;
+  const makeAuthenticatedRequest = auth.makeAuthenticatedRequest;
 
   const [modelData, setModelData] = useState<Model | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,11 +48,8 @@ export function useManageModel(id: string | string[] | undefined, setTags: Dispa
         setName(data.name || "");
         setDescription(data.description || "");
 
-        if (Array.isArray(data.tags)) {
-          setTags(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            data.tags.map((t: any) => typeof t === "string" ? t : t.name));
-        }
+        if (onSuccess) onSuccess(data);
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         setError(e.message || "Error loading model");
@@ -57,15 +61,15 @@ export function useManageModel(id: string | string[] | undefined, setTags: Dispa
     loadModel();
   }, [
     id,
-    auth.token,
     auth.isLoading,
     makeAuthenticatedRequest,
     setIsLoading,
     setModelData,
     setName,
     setDescription,
-    setTags,
     setError,
+    onSuccess,
+    auth.token,
   ]);
 
   const handleSaveDraft = async () => {
@@ -89,11 +93,9 @@ export function useManageModel(id: string | string[] | undefined, setTags: Dispa
       if (!res.ok) throw new Error("Failed to save");
       const updated = await res.json();
       setModelData(updated);
-      if (updated.tags) {
-        setTags(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          updated.tags.map((t: any) => typeof t === "string" ? t : t.name));
-      }
+
+      if (onSuccess) onSuccess(updated);
+
     } catch (e) {
       console.error(e);
     } finally {
@@ -142,6 +144,6 @@ export function useManageModel(id: string | string[] | undefined, setTags: Dispa
     name,
     description,
     setName,
-    setDescription
+    setDescription,
   };
 }
