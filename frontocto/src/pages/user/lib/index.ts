@@ -1,1 +1,1 @@
-export { PushToUser } from "./push-to-user";
+export { UserRedirect as PushToUser } from "./push-to-user";

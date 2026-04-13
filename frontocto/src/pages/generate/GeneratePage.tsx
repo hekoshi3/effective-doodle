@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useGenerate } from "./model/useGenerate";
-import { usePushToLogin } from "../user/lib/usePushToLogin";
+import { usePushToLogin } from "@/entities/user";
+import { LoadingScreen } from "@/shared/ui"
 
 export function GeneratePage() {
   const { state, actions, func, imageInfo } = useGenerate()
@@ -11,9 +12,7 @@ export function GeneratePage() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-neutral-900">
-        <span className="loading loading-ring loading-xl text-accent"></span>
-      </main>
+      <LoadingScreen/>
     );
   }
 

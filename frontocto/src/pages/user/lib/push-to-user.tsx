@@ -1,47 +1,32 @@
 "use client";
 
-import { GalleryImage } from "@/entities/AIimage";
 import { useAuth } from "@/entities/user";
+import { LoadingScreen } from "@/shared/ui";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
-
-export function PushToUser() {
-    const { makeAuthenticatedRequest } = useAuth();
+export function UserRedirect() {
+    const { user, isLoading, token } = useAuth();
     const router = useRouter();
 
-    const fetchUserId = async (): Promise<number | null> => {
-        try {
-            const makeRequest = makeAuthenticatedRequest as (url: string, options?: RequestInit) => Promise<Response>;
+    useEffect(() => {
+        if (isLoading) return
 
-            const meResponse = await makeRequest(`${API_HOST}/users/me/`);
-            if (meResponse.ok) {
-                const userData = await meResponse.json();
-                if (userData.username) {
-                    router.push(`/user/${userData.username}`);
-                }
-
-                const imagesResponse = await makeRequest(`${API_HOST}/images/`);
-                if (imagesResponse.ok) {
-                    const imagesData = await imagesResponse.json();
-                    const userImage = imagesData.results?.find(
-                        (img: GalleryImage) => img.author.id === userData.id
-                    );
-                    if (userImage?.author?.username) {
-                        router.push(`/user/${userImage.author.username}`);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error fetching user ID:", error);
+        if (!token) {
+            router.replace("/auth"); return;
         }
-        return null;
-    };
 
-    fetchUserId()
+        if (user?.username) {
+            router.replace(`/user/${user.username}`)
+        } else {
+            console.warn("User data found, but username is missing")
+            router.replace("/")
+        }
+    }, [user, isLoading, token, router])
+
     return (
         <>
-        <div className="min-h-screen"></div>
+            <LoadingScreen/>
         </>
     );
 }

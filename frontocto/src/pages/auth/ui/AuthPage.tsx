@@ -1,74 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/entities/user";
-
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8002/api";
+import { useAuthForm } from "@/features/user";
 
 export function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { login, register, makeAuthenticatedRequest } = useAuth();
-  const router = useRouter();
 
-  const fetchUserId = async (): Promise<number | null> => {
-    try {
-      const makeRequest = makeAuthenticatedRequest as (url: string, options?: RequestInit) => Promise<Response>;
-      
-      const meResponse = await makeRequest(`${API_HOST}/users/me/`);
-      if (meResponse.ok) {
-        const userData = await meResponse.json();
-        if (userData.username) {
-          return userData.username;
-        }
-        
-        const imagesResponse = await makeRequest(`${API_HOST}/images/`);
-        if (imagesResponse.ok) {
-          const imagesData = await imagesResponse.json();
-          const userImage = imagesData.results?.find(
-            (img: any) => img.authorId === userData.id
-          );
-          if (userImage?.authorId) {
-            return userImage.author.id;
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching user ID:", error);
-    }
-    return null;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      if (isLogin) {
-        await (login as (username: string, password: string) => Promise<any>)(username, password);
-      } else {
-        await (register as (username: string, email: string, password: string) => Promise<any>)(username, email, password);
-      }
-      
-      const userId = await fetchUserId();
-      if (userId) {
-        router.push(`/user/${userId}`);
-      } else {
-        router.push("/");
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { state, functions } = useAuthForm()
+  const { isLoading, error, isLogin } = state;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-neutral-900 p-4">
@@ -84,7 +21,7 @@ export function AuthPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={functions.handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-neutral-300 mb-1">
               Username
@@ -96,8 +33,6 @@ export function AuthPage() {
               required
               className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 
@@ -113,8 +48,6 @@ export function AuthPage() {
                 required
                 className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           )}
@@ -130,8 +63,6 @@ export function AuthPage() {
               required
               className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -153,11 +84,7 @@ export function AuthPage() {
         <div className="mt-6 text-center">
           <button
             type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError("");
-              setEmail("");
-            }}
+            onClick={functions.toggleLogin}
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
             {isLogin

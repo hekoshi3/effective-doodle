@@ -24,6 +24,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (res.ok) {
         const data: User = await res.json();
         setUser(data);
+        return(data)
       }
     } catch (e) {
       console.error("Failed to fetch user profile", e);
@@ -74,9 +75,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken_(access);
       setRefreshToken_(refresh);
 
-      await fetchMe(access);
+      /*await fetchMe(access);
 
-      return { success: true };
+      const userResponse = await fetch(`${API_HOST}/users/me`, {
+        headers: { Authorization: `Bearer ${access}` }
+      })*/
+
+        const userData = await fetchMe(access)
+
+      return { success: true, user: userData || undefined };
     } catch (error) {
       console.error("Login error:", error);
       throw error;
