@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../generated"
+  previewFeatures     = ["driverAdapters", "queryCompiler", "relationJoins"]
+  runtime             = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+
+  profile UserProfile?
+  models AiModel[]
+  images GeneratedImage[]
+  comments Comment[]
+  likes Like[]
+
+  following UserFollow[] @relation("follower")
+  followers UserFollow[] @relation("following")
+
+  notifications Notification[] @relation("recipient")
+  actions Notification[] @relation("actor")
+}
+
+model UserProfile {
+  id Int @id @default(autoincrement())
+  bio String? @db.Text
+
+  avatar String?
+  banner String?
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum AiModelType {
+  LORA
+  CHECKPOINT
+  EMBEDDING
+  UPSCALER
+  CONTROLNET
+}
+
+model AiModel {
+  id Int @id @default(autoincrement())
+  name String
+  modelType AiModelType
+  description String? @db.Text
+  file String
+  fileHash String?
+  downloadsCount Int @default(0)
+  likesCount Int @default(0)
+  isPublished Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  authorId Int
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  featuredImageId Int?
+  featuredImage GeneratedImage? @relation("FeaturedImage", fields: [featuredImageId], references: [id])
+
+  tags Tag[]
+  comments Comment[]
+  likes Like[]
+
+  usedInImages GeneratedImage[] @relation("ModelResources")
+  generatedImages GeneratedImage[] @relation("linkedModel")
+  notifications Notification[]
+}
+
+model GeneratedImage {
+  id Int @id @default(autoincrement())
+  image String
+  description String? @db.Text
+  generationParams Json?
+  isPublished Boolean @default(false)
+  likesCount Int @default(0)
+  createdAt DateTime @default(now())
+
+  authorId Int
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  linkedModelId Int?
+  linkedModel AiModel? @relation("linkedModel", fields: [linkedModelId], references: [id])
+
+  resources AiModel[] @relation("ModelResources")
+  tags Tag[]
+  comments Comment[]
+  likes Like[]
+
+  featuredInModels AiModel[] @relation("FeaturedImage")
+  notifications Notification[]
+}
+
+model Tag {
+  id Int @id @default(autoincrement())
+  name String @unique
+  models AiModel[]
+  images GeneratedImage[]
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  text String @db.Text
+  createdAt DateTime @default(now())
+
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  imageId Int?
+  image GeneratedImage? @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  modelId Int?
+  model AiModel? @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  notifications Notification[]
+}
+
+model Like {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  imageId Int?
+  image GeneratedImage? @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  modelId Int?
+  model AiModel? @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, imageId])
+  @@unique([userId, modelId])
+}
+
+model UserFollow {
+  followerId Int
+  followingId Int
+  createdAt DateTime @default(now())
+
+  follower User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  NEW_POST
+  MENTION
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  type        NotificationType
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  recipientId Int
+  recipient   User             @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  actorId     Int
+  actor       User             @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  imageId     Int?
+  image       GeneratedImage?  @relation(fields: [imageId], references: [id])
+
+  modelId     Int?
+  model       AiModel?         @relation(fields: [modelId], references: [id])
+
+  commentId   Int?
+  comment     Comment?         @relation(fields: [commentId], references: [id])
+}
