@@ -5,10 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider            = "prisma-client"
-  output              = "../generated"
-  previewFeatures     = ["driverAdapters", "queryCompiler", "relationJoins"]
-  runtime             = "nodejs"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -17,33 +16,33 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String @unique
-  email String @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
 
-  profile UserProfile?
-  models AiModel[]
-  images GeneratedImage[]
+  profile  UserProfile?
+  models   AiModel[]
+  images   GeneratedImage[]
   comments Comment[]
-  likes Like[]
+  likes    Like[]
 
   following UserFollow[] @relation("follower")
   followers UserFollow[] @relation("following")
 
   notifications Notification[] @relation("recipient")
-  actions Notification[] @relation("actor")
+  actions       Notification[] @relation("actor")
 }
 
 model UserProfile {
-  id Int @id @default(autoincrement())
+  id  Int     @id @default(autoincrement())
   bio String? @db.Text
 
   avatar String?
   banner String?
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int     @unique
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum AiModelType {
@@ -55,103 +54,103 @@ enum AiModelType {
 }
 
 model AiModel {
-  id Int @id @default(autoincrement())
-  name String
-  modelType AiModelType
-  description String? @db.Text
-  file String
-  fileHash String?
-  downloadsCount Int @default(0)
-  likesCount Int @default(0)
-  isPublished Boolean @default(false)
-  createdAt DateTime @default(now())
+  id             Int         @id @default(autoincrement())
+  name           String
+  modelType      AiModelType
+  description    String?     @db.Text
+  file           String
+  fileHash       String?
+  downloadsCount Int         @default(0)
+  likesCount     Int         @default(0)
+  isPublished    Boolean     @default(false)
+  createdAt      DateTime    @default(now())
 
   authorId Int
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   featuredImageId Int?
-  featuredImage GeneratedImage? @relation("FeaturedImage", fields: [featuredImageId], references: [id])
+  featuredImage   GeneratedImage? @relation("FeaturedImage", fields: [featuredImageId], references: [id])
 
-  tags Tag[]
+  tags     Tag[]
   comments Comment[]
-  likes Like[]
+  likes    Like[]
 
-  usedInImages GeneratedImage[] @relation("ModelResources")
+  usedInImages    GeneratedImage[] @relation("ModelResources")
   generatedImages GeneratedImage[] @relation("linkedModel")
-  notifications Notification[]
+  notifications   Notification[]
 }
 
 model GeneratedImage {
-  id Int @id @default(autoincrement())
-  image String
-  description String? @db.Text
+  id               Int      @id @default(autoincrement())
+  image            String
+  description      String?  @db.Text
   generationParams Json?
-  isPublished Boolean @default(false)
-  likesCount Int @default(0)
-  createdAt DateTime @default(now())
+  isPublished      Boolean  @default(false)
+  likesCount       Int      @default(0)
+  createdAt        DateTime @default(now())
 
   authorId Int
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   linkedModelId Int?
-  linkedModel AiModel? @relation("linkedModel", fields: [linkedModelId], references: [id])
+  linkedModel   AiModel? @relation("linkedModel", fields: [linkedModelId], references: [id])
 
   resources AiModel[] @relation("ModelResources")
-  tags Tag[]
-  comments Comment[]
-  likes Like[]
+  tags      Tag[]
+  comments  Comment[]
+  likes     Like[]
 
-  featuredInModels AiModel[] @relation("FeaturedImage")
-  notifications Notification[]
+  featuredInModels AiModel[]      @relation("FeaturedImage")
+  notifications    Notification[]
 }
 
 model Tag {
-  id Int @id @default(autoincrement())
-  name String @unique
+  id     Int              @id @default(autoincrement())
+  name   String           @unique
   models AiModel[]
   images GeneratedImage[]
 }
 
 model Comment {
-  id Int @id @default(autoincrement())
-  text String @db.Text
+  id        Int      @id @default(autoincrement())
+  text      String   @db.Text
   createdAt DateTime @default(now())
 
   userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   imageId Int?
-  image GeneratedImage? @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  image   GeneratedImage? @relation(fields: [imageId], references: [id], onDelete: Cascade)
 
   modelId Int?
-  model AiModel? @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  model   AiModel? @relation(fields: [modelId], references: [id], onDelete: Cascade)
 
   notifications Notification[]
 }
 
 model Like {
-  id Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
   userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   imageId Int?
-  image GeneratedImage? @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  image   GeneratedImage? @relation(fields: [imageId], references: [id], onDelete: Cascade)
 
   modelId Int?
-  model AiModel? @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  model   AiModel? @relation(fields: [modelId], references: [id], onDelete: Cascade)
 
   @@unique([userId, imageId])
   @@unique([userId, modelId])
 }
 
 model UserFollow {
-  followerId Int
+  followerId  Int
   followingId Int
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 
-  follower User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@id([followerId, followingId])
@@ -166,23 +165,23 @@ enum NotificationType {
 }
 
 model Notification {
-  id          Int              @id @default(autoincrement())
-  type        NotificationType
-  isRead      Boolean          @default(false)
-  createdAt   DateTime         @default(now())
+  id        Int              @id @default(autoincrement())
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
 
   recipientId Int
-  recipient   User             @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipient   User @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade)
 
-  actorId     Int
-  actor       User             @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
+  actorId Int
+  actor   User @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
 
-  imageId     Int?
-  image       GeneratedImage?  @relation(fields: [imageId], references: [id])
+  imageId Int?
+  image   GeneratedImage? @relation(fields: [imageId], references: [id])
 
-  modelId     Int?
-  model       AiModel?         @relation(fields: [modelId], references: [id])
+  modelId Int?
+  model   AiModel? @relation(fields: [modelId], references: [id])
 
-  commentId   Int?
-  comment     Comment?         @relation(fields: [commentId], references: [id])
+  commentId Int?
+  comment   Comment? @relation(fields: [commentId], references: [id])
 }
