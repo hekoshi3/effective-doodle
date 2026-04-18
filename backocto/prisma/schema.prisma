@@ -33,6 +33,8 @@ model User {
 
   notifications Notification[] @relation("recipient")
   actions       Notification[] @relation("actor")
+
+  hashedRt String?
 }
 
 model UserProfile {
