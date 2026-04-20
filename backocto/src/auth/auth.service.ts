@@ -55,25 +55,25 @@ export class AuthService {
       throw new UnauthorizedException('Uncorrect data');
     }
 
-    //const payload = { sub: user.id, username: user.username };
-    const tokens = this.getTokens(user.id, user.username);
-    await this.updateRtHash(user.id, (await tokens).refresh);
+    const tokens = await this.getTokens(user.id, user.username);
+    await this.updateRtHash(user.id, tokens.refresh);
     return {
-      access: (await tokens).access,
-      refresh: (await tokens).refresh, //access_token: await this.jwtService.signAsync(payload),
+      access: tokens.access,
+      refresh: tokens.refresh, //access_token: await this.jwtService.signAsync(payload),
     };
   }
 
   async getTokens(userId: number, username: string) {
+    const payload = { sub: userId, username };
     const [at, rt] = await Promise.all([
-      this.jwtService.signAsync(
-        { sub: userId, username },
-        { secret: 'AT_SECRET', expiresIn: '15m' },
-      ),
-      this.jwtService.signAsync(
-        { sub: userId, username },
-        { secret: 'RT_SECRET', expiresIn: '7d' },
-      ),
+      this.jwtService.signAsync(payload, {
+        secret: 'AT_SECRET',
+        expiresIn: '1d',
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: 'RT_SECRET',
+        expiresIn: '7d',
+      }),
     ]);
     return { access: at, refresh: rt };
   }
