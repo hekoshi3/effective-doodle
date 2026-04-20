@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +46,7 @@ export class AuthService {
     };
   }
 
-  async login(dto: RegisterDto) {
+  async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { username: dto.username },
     });
@@ -56,10 +57,10 @@ export class AuthService {
 
     //const payload = { sub: user.id, username: user.username };
     const tokens = this.getTokens(user.id, user.username);
-    await this.updateRtHash(user.id, (await tokens).refresh_token);
+    await this.updateRtHash(user.id, (await tokens).refresh);
     return {
-      access_token: (await tokens).access_token,
-      refresh_token: (await tokens).refresh_token, //access_token: await this.jwtService.signAsync(payload),
+      access: (await tokens).access,
+      refresh: (await tokens).refresh, //access_token: await this.jwtService.signAsync(payload),
     };
   }
 
@@ -74,7 +75,7 @@ export class AuthService {
         { secret: 'RT_SECRET', expiresIn: '7d' },
       ),
     ]);
-    return { access_token: at, refresh_token: rt };
+    return { access: at, refresh: rt };
   }
 
   async updateRtHash(userId: number, rt: string) {
@@ -99,7 +100,7 @@ export class AuthService {
       );
 
     const tokens = await this.getTokens(user.id, user.username);
-    await this.updateRtHash(user.id, tokens.refresh_token);
+    await this.updateRtHash(user.id, tokens.refresh);
     return tokens;
   }
 

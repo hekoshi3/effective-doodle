@@ -17,6 +17,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
   validate(req: Request, payload: any) {
     const refreshToken = req.get('authorization')!.replace('Bearer', '').trim();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return { ...payload, refreshToken };
   }
 }
