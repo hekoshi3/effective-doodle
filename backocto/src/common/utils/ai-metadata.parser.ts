@@ -13,7 +13,7 @@ export interface AIParams {
   seed?: string;
   width?: number;
   height?: number;
-  [key: string]: string | number | undefined;
+  [key: string]: any;
 }
 
 export const extractAIMetadata = async (
@@ -23,35 +23,64 @@ export const extractAIMetadata = async (
     const image = sharp(filePath);
     const metadata = await image.metadata();
 
-    const rawParams = (metadata as any).text?.parameters || '';
-
+    const textMetadata = (metadata as any).comments || {};
+    const raw: string =
+      textMetadata.parameters ||
+      textMetadata[0].text ||
+      textMetadata.prompt ||
+      '';
+    console.log(metadata);
+    console.log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    console.log(textMetadata[0].text);
     const result: any = {
-      width: metadata.width,
-      height: metadata.height,
+      raw: raw,
+      real_width: metadata.width,
+      real_height: metadata.height,
     };
 
-    if (rawParams) {
-      const parts = rawParams.split('\n');
-      result.prompt = parts[0];
+    if (raw) {
+      const parts = raw.split('Steps: ');
+      const promptPart = parts[0];
+      const paramPart = parts.length > 1 ? 'Steps: ' + parts[1] : '';
 
-      const negativeMatch = rawParams.match(/Negative prompt: (.*)/);
-      if (negativeMatch) result.negative_prompt = negativeMatch[1];
+      if (promptPart.includes('Negative prompt:')) {
+        const pSplit = promptPart.split('Negative prompt:');
+        result.prompt = pSplit[0].trim();
+        result.negative_prompt = pSplit[1].trim();
+      } else {
+        result.prompt = promptPart.trim();
+        result.negative_prompt = '';
+      }
 
-      const settingsLine = rawParams.match(/Steps: (.*)/);
-      if (settingsLine) {
-        const pairs = settingsLine.split(', ');
-        pairs.forEach((pair) => {
-          const [key, val] = pair.split(': ');
-          if (key && val) {
-            const normalizedKey = key.trim().toLowerCase().replace(/\s+/g, '_');
-            result[normalizedKey] = val.trim();
-          }
-        });
+      if (paramPart) {
+        const regex = /\b([\w\s]+):\s*(.*?)(?=(?:\s*,\s*[\w\s]+:|$))/g;
+
+        let match;
+        while ((match = regex.exec(paramPart)) !== null) {
+          const key = match[0]
+            .trim()
+            .toLowerCase()
+            .split(':')[0]
+            .replace(/\s+/g, '_');
+          let value = match[2].trim();
+
+          if (value.endsWith(',')) value = value.slice(0, -1);
+
+          result[key] = value;
+        }
+
+        if (result.size && typeof result.size === 'string') {
+          const [w, h]: string = result.size.split('x');
+          result.width = parseInt(w) || result.width;
+          result.height = parseInt(h) || result.height;
+        }
       }
     }
-
+    console.log('result ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+    console.log(result);
     return result;
-  } catch {
+  } catch (error) {
+    console.error('Sharp Metadata Error: ', error);
     return {};
   }
 };
