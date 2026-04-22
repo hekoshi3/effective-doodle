@@ -9,7 +9,7 @@ import { AuthImageCard } from "@/features/manage-image";
 import { AuthModelCard } from "@/features/manage-model";
 import { useEffect, useState } from "react";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://127.0.0.1:8000/api";
 
 const getDateAfter = (range: string) => {
     if (!range) return "";

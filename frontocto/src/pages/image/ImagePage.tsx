@@ -8,7 +8,7 @@ import { GalleryImage } from "@/entities/AIimage";
 import { CommentList, Comment } from "@/entities/comment";
 import { useAuth } from "@/entities/user";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://127.0.0.1:8000/api";
 
 export function ImageDetailPage() {
     const params = useParams();
@@ -235,13 +235,13 @@ export function ImageDetailPage() {
                             <h3 className="text-sm uppercase tracking-widest text-neutral-500 font-bold mb-6">Generation Parameters</h3>
                             <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
                                 {[
-                                    { label: "Model", value: image.generation_params.model },
-                                    { label: "Sampler", value: image.generation_params.sampler },
-                                    { label: "Scheduler", value: image.generation_params.schedule_type },
-                                    { label: "Seed", value: image.generation_params.seed },
-                                    { label: "Steps", value: image.generation_params.steps },
-                                    { label: "CFG Scale", value: image.generation_params.cfg_scale },
-                                    { label: "Resolution", value: `${image.generation_params.width} × ${image.generation_params.height}` },
+                                    { label: "Model", value: image.generation_params?.model ?? "" },
+                                    { label: "Sampler", value: image.generation_params?.sampler ?? ""},
+                                    { label: "Scheduler", value: image.generation_params?.schedule_type ?? ""},
+                                    { label: "Seed", value: image.generation_params?.seed ?? ""},
+                                    { label: "Steps", value: image.generation_params?.steps ?? ""},
+                                    { label: "CFG Scale", value: image.generation_params?.cfg_scale ?? ""},
+                                    { label: "Resolution", value: `${image.generation_params?.width ?? "" } × ${image.generation_params?.height ?? ""}` },
                                 ].map((item, i) => item.value && (
                                     <div key={i} className="flex flex-col border-l-2 border-neutral-700 pl-3">
                                         <span className="text-neutral-500 text-[10px] uppercase font-bold">{item.label}</span>
@@ -250,7 +250,7 @@ export function ImageDetailPage() {
                                 ))}
                             </div>
                             
-                            {image.generation_params.prompt && (
+                            {image.generation_params?.prompt && (
                                 <div className="mt-8 pt-6 border-t border-neutral-700">
                                     <span className="text-neutral-500 text-[10px] uppercase font-bold">Prompt</span>
                                     <div className="mt-2 p-3 bg-neutral-900/50 rounded-lg text-sm text-neutral-200 leading-relaxed wrap-break-word whitespace-pre-wrap font-mono">
@@ -259,7 +259,7 @@ export function ImageDetailPage() {
                                 </div>
                             )}
                             
-                            {image.generation_params.negative_prompt && (
+                            {image.generation_params?.negative_prompt && (
                                 <div className="mt-4">
                                     <span className="text-[10px] uppercase font-bold text-red-400/60">Negative Prompt</span>
                                     <div className="mt-2 p-3 bg-neutral-900/50 rounded-lg text-sm text-neutral-400 leading-relaxed wrap-break-word whitespace-pre-wrap font-mono border border-red-900/10">

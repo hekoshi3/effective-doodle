@@ -43,7 +43,7 @@ export function ImageUploadPage() {
         setIsSubmitting(true);
         const form = new FormData();
         form.append("image", selectedImage);
-        try {
+        try {    
             const imageId = await upload(form);
             if (imageId) {
                 router.push(`/image/edit/${imageId}`);

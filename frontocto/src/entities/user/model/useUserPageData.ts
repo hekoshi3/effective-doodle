@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { User, Analytics } from "./user.types";
 import { AuthContextType } from "./auth.types";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://127.0.0.1:8000/api";
 
 export function useUserPageData(username: string, auth: AuthContextType) {
   const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { GalleryImage } from "@/entities/AIimage";
 import { Model } from "@/entities/AImodel";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000/api";
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://127.0.0.1:8000/api";
 
 export const NavbarSearch = () => {
     const [query, setQuery] = useState("");
