@@ -49,7 +49,7 @@ CREATE TABLE "GeneratedImage" (
     "id" SERIAL NOT NULL,
     "image" TEXT NOT NULL,
     "description" TEXT,
-    "generationParams" JSONB,
+    "generation_params" JSONB,
     "isPublished" BOOLEAN NOT NULL DEFAULT false,
     "likesCount" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
