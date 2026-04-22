@@ -19,13 +19,13 @@ async function bootstrap() {
     .setDescription('The Octo API')
     .setVersion('1.0')
     .build();
-  app.useStaticAssets(join(__dirname, '..', 'media'), {
+  app.useStaticAssets(join(process.cwd(), 'media'), {
     prefix: '/media/',
   });
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(process.env.PORT ?? 5001, '0.0.0.0');
+  await app.listen(process.env.BACKEND_PORT ?? 5001, '0.0.0.0');
 }
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrap();
