@@ -52,7 +52,7 @@ export function SettingsProfile() {
             bio: e.get('bio'),
         }
         if (!selectedAvatarImage && !selectedBannerImage && !rawFormData.bio && !rawFormData.name && isSubmitting) return;
-        console.log("goes forward, "+ selectedAvatarImage + selectedBannerImage + rawFormData.bio + rawFormData.name)
+        //console.log("goes forward, "+ selectedAvatarImage + selectedBannerImage + rawFormData.bio + rawFormData.name)
 
         setIsSubmitting(true);
         const form = new FormData();
@@ -61,7 +61,7 @@ export function SettingsProfile() {
         if (rawFormData.bio) form.append("name", rawFormData.bio)
         if (rawFormData.name) form.append("bio", rawFormData.name)
 
-       console.log("goes next, "+ selectedAvatarImage + selectedBannerImage + form.get('name') + form.get('bio'))
+        //console.log("goes next, "+ selectedAvatarImage + selectedBannerImage + form.get('name') + form.get('bio'))
 
         try {
             const res = await makeAuthenticatedRequest(`${API_HOST}/users/me/`, {
@@ -111,7 +111,7 @@ export function SettingsProfile() {
                         </li>
                         <li className="list-row flex justify-between items-center min-w-xl">
                             <div><p className="text-xl">Name</p></div>
-                            <input type="text" name="name" className="input bg-neutral-800" onChange={bioChange} disabled/>
+                            <input type="text" name="name" className="input bg-neutral-800" onChange={bioChange} disabled />
                         </li>
                         <li className="list-row flex justify-between items-center min-w-xl">
                             <div><p className="text-xl">Bio</p></div>
