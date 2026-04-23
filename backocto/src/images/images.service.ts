@@ -34,13 +34,14 @@ export class ImagesService {
       image: this.getFileUrl(img.image),
       is_published: img.isPublished,
       likes_count: img.likes_count ?? img._count?.likes ?? 0,
-      authos: img.author
+      author: img.author
         ? {
             ...img.author,
             profile: img.author.profile
               ? {
                   ...img.author.profile,
                   avatar: this.getFileUrl(img.author.profile.avatar),
+                  bio: img.author.bio,
                 }
               : null,
           }
