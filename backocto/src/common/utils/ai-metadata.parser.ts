@@ -29,9 +29,6 @@ export const extractAIMetadata = async (
       textMetadata[0].text ||
       textMetadata.prompt ||
       '';
-    console.log(metadata);
-    console.log('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    console.log(textMetadata[0].text);
     const result: any = {
       raw: raw,
       real_width: metadata.width,
@@ -76,8 +73,7 @@ export const extractAIMetadata = async (
         }
       }
     }
-    console.log('result ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    console.log(result);
+
     return result;
   } catch (error) {
     console.error('Sharp Metadata Error: ', error);

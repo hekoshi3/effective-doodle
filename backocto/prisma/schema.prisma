@@ -56,22 +56,21 @@ enum AiModelType {
 }
 
 model AiModel {
-  id             Int         @id @default(autoincrement())
-  name           String
-  modelType      AiModelType
-  description    String?     @db.Text
-  file           String
-  fileHash       String?
-  downloadsCount Int         @default(0)
-  likesCount     Int         @default(0)
-  isPublished    Boolean     @default(false)
-  createdAt      DateTime    @default(now())
+  id              Int             @id @default(autoincrement())
+  name            String
+  modelType       AiModelType
+  description     String?         @db.Text
+  file            String
+  fileHash        String?
+  downloadsCount  Int             @default(0)
+  likesCount      Int             @default(0)
+  isPublished     Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  featuredImageId Int?
+  featuredImage   GeneratedImage? @relation("FeaturedImage", fields: [featuredImageId], references: [id])
 
   authorId Int
   author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  featuredImageId Int?
-  featuredImage   GeneratedImage? @relation("FeaturedImage", fields: [featuredImageId], references: [id])
 
   tags     Tag[]
   comments Comment[]
@@ -83,13 +82,13 @@ model AiModel {
 }
 
 model GeneratedImage {
-  id               Int      @id @default(autoincrement())
-  image            String
-  description      String?  @db.Text
+  id                Int      @id @default(autoincrement())
+  image             String
+  description       String?  @db.Text
   generation_params Json?
-  isPublished      Boolean  @default(false)
-  likesCount       Int      @default(0)
-  createdAt        DateTime @default(now())
+  isPublished       Boolean  @default(false)
+  likesCount        Int      @default(0)
+  createdAt         DateTime @default(now())
 
   authorId Int
   author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
