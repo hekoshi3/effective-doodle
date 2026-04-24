@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';
 
-export const editFileName = (req, file, callback) => {
+export const editFileName = (
+  file: { originalname: string },
+  callback: (arg0: null, arg1: string) => void,
+) => {
   const name = file.originalname.split('.')[0];
   const fileExtName = extname(file.originalname);
 
@@ -20,8 +19,11 @@ export const editFileName = (req, file, callback) => {
 export const userDirectoryPath = (
   subFolder: 'images' | 'models' | 'avatars',
 ) => {
-  return (req: any, file, cb) => {
-    const userId = req.user?.userId || 'unknown';
+  return (
+    req: { user: { userId: string } },
+    cb: (arg0: null, arg1: string) => void,
+  ) => {
+    const userId = req.user.userId || 'unknown';
     const path = `./media/${subFolder}/user_${userId}`;
 
     if (!existsSync(path)) {

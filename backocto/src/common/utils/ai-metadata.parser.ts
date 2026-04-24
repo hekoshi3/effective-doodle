@@ -52,7 +52,7 @@ export const extractAIMetadata = async (
       if (paramPart) {
         const regex = /\b([\w\s]+):\s*(.*?)(?=(?:\s*,\s*[\w\s]+:|$))/g;
 
-        let match;
+        let match: string[] | null;
         while ((match = regex.exec(paramPart)) !== null) {
           const key = match[0]
             .trim()
