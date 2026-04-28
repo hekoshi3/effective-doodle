@@ -7,6 +7,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ImagesModule } from './images/images.module';
 import { ModelsModule } from './models/models.module';
 import { ConfigModule } from './config/config.module';
+import { UsersController } from './users/users.controller';
+import { UsersModule } from './users/users.module';
+import { UsersService } from './users/users.service';
 
 @Module({
   imports: [
@@ -20,8 +23,9 @@ import { ConfigModule } from './config/config.module';
     ImagesModule,
     ModelsModule,
     ConfigModule,
+    UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, UsersController],
+  providers: [AppService, UsersService],
 })
 export class AppModule {}
