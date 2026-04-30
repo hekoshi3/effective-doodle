@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (!response.ok) {
         const error = await response.json();
         throw new Error(
-          error.username?.[0] || error.email?.[0] || error.password?.[0] || "Registration failed"
+          error.username?.[0] || error.email?.[0] || error.password?.[0] || error.message || "Unknown error"
         );
       }
 

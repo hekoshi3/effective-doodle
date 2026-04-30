@@ -19,6 +19,7 @@ export function UserRedirect() {
         if (user?.username) {
             router.replace(`/user/${user.username}`)
         } else {
+            console.log(user)
             console.warn("User data found, but username is missing")
             router.replace("/")
         }

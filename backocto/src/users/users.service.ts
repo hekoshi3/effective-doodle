@@ -42,22 +42,57 @@ export class UsersService {
       is_following: currentUserId ? u.followers.length > 0 : false,
     }));
 
-    return {
+    const _return = {
       count: results.length,
       next: null,
       previous: null,
       results,
     };
+
+    return _return;
   }
 
-  async getMe(userId: number) {
+  async findOne(username: string, currentUserId?: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+      where: { username },
+      include: {
+        profile: true,
+        _count: {
+          select: { followers: true },
+        },
+        followers: currentUserId
+          ? { where: { followerId: currentUserId } }
+          : false,
+      },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const result = {
+      id: user.id,
+      username: user.username,
+      profile: {
+        username: user.username,
+        bio: user.profile?.bio || '',
+        avatar: this.getFileUrl(user.profile!.avatar),
+        banner: this.getFileUrl(user.profile!.banner),
+      },
+      followers_count: user._count.followers,
+      is_following: currentUserId ? user.followers.length > 0 : false,
+    };
+
+    return result;
+  }
+
+  async getMe(username: string, userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { username },
       include: {
         profile: true,
       },
     });
 
+    console.log(user);
     if (!user) throw new NotFoundException('User not found');
 
     const [
@@ -91,7 +126,7 @@ export class UsersService {
       (modelLikesAgg._sum.likesCount || 0) +
       (imageLikesAgg._sum.likesCount || 0);
 
-    return {
+    const _return = {
       id: user.id,
       username: user.username,
       email: user.email,
@@ -108,5 +143,9 @@ export class UsersService {
         images_count: imagesCount,
       },
     };
+
+    console.log(_return);
+
+    return _return;
   }
 }
