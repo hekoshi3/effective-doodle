@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { getFileHash } from '../common/utils/file-hash.utils';
-import * as fs from 'fs';
+import fs from 'fs/promises';
 import { UpdateModelDto } from './dto/update-model.dto';
 
 @Injectable()
@@ -66,27 +66,11 @@ export class ModelsService {
     });
     try {
       if (dublicate) {
-        fs.stat(filePath, (e) => {
-          if (e) {
-            throw new Error('File not found,', e);
-          } else
-            fs.unlink(filePath, (e) => {
-              if (e) {
-                throw new Error('Cannot remove file,', e);
-              }
-            });
-        });
+        await fs.access(filePath);
+        await fs.unlink(filePath);
         if (previewPath) {
-          fs.stat(previewPath, (e) => {
-            if (e) {
-              throw new Error('File not found,', e);
-            } else
-              fs.unlink(previewPath, (e) => {
-                if (e) {
-                  throw new Error('Cannot remove file,', e);
-                }
-              });
-          });
+          await fs.stat(previewPath);
+          await fs.unlink(previewPath);
         }
       }
     } catch {
@@ -195,16 +179,12 @@ export class ModelsService {
     if (model.authorId !== userId)
       throw new ForbiddenException('User have no access to this object');
 
-    fs.stat(model.file, (e) => {
-      if (e) {
-        throw new Error('Cannot remove file,', e);
-      } else
-        fs.unlink(model.file, (e) => {
-          if (e) {
-            throw new Error('Cannot remove file, ', e);
-          }
-        });
-    });
+    try {
+      await fs.access(model.file);
+      await fs.unlink(model.file);
+    } catch (e) {
+      console.warn(`File not found or cannot be deleted: ${model.file}`, e);
+    }
 
     return this.prisma.aiModel.delete({ where: { id } });
   }

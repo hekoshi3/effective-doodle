@@ -11,7 +11,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { extractAIMetadata } from '../common/utils/ai-metadata.parser';
 import { UpdateImageDto } from './dto/update-image.dto';
-import * as fs from 'fs';
+import fs from 'fs/promises';
 
 @Injectable()
 export class ImagesService {
@@ -170,18 +170,13 @@ export class ImagesService {
   async remove(id: number, userId) {
     const img = await this.findOne(id);
     if (img.authorId !== userId)
-      throw new ForbiddenException('User have no access to this object');
-
-    fs.stat(img.file, (e) => {
-      if (e) {
-        throw new Error('Cannot remove file,', e);
-      } else
-        fs.unlink(img.file, (e) => {
-          if (e) {
-            throw new Error('Cannot remove file, ', e);
-          }
-        });
-    });
+      throw new ForbiddenException('User has no access to this object');
+    try {
+      await fs.access(img.file);
+      await fs.unlink(img.file);
+    } catch (e) {
+      console.warn(`File not found or cannot be deleted: ${img.file}`, e);
+    }
 
     return this.prisma.generatedImage.delete({ where: { id } });
   }
