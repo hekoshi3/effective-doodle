@@ -58,8 +58,8 @@ export function SettingsProfile() {
         const form = new FormData();
         if (selectedAvatarImage) form.append("avatar", selectedAvatarImage);
         if (selectedBannerImage) form.append("banner", selectedBannerImage);
-        if (rawFormData.bio) form.append("name", rawFormData.bio)
-        if (rawFormData.name) form.append("bio", rawFormData.name)
+        if (rawFormData.bio) form.append("bio", rawFormData.bio)
+        if (rawFormData.name) form.append("name", rawFormData.name)
 
         //console.log("goes next, "+ selectedAvatarImage + selectedBannerImage + form.get('name') + form.get('bio'))
 

@@ -40,7 +40,7 @@ export function useUserPageData(username: string, auth: AuthContextType) {
         if (!userRes.ok) notFound();
 
         const userData: User = await userRes.json();
-        console.log(userData)
+        //console.log(userData)
         setUserProfile(userData);
 
         const analyticsRes = auth.token
