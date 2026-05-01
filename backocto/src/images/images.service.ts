@@ -172,7 +172,16 @@ export class ImagesService {
     if (img.authorId !== userId)
       throw new ForbiddenException('User have no access to this object');
 
-    if (fs.existsSync(img.image)) fs.unlinkSync(img.image);
+    fs.stat(img.file, (e) => {
+      if (e) {
+        throw new Error('Cannot remove file,', e);
+      } else
+        fs.unlink(img.file, (e) => {
+          if (e) {
+            throw new Error('Cannot remove file, ', e);
+          }
+        });
+    });
 
     return this.prisma.generatedImage.delete({ where: { id } });
   }

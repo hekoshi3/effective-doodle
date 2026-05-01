@@ -64,9 +64,32 @@ export class ModelsService {
     const dublicate = await this.prisma.aiModel.findFirst({
       where: { fileHash },
     });
-    if (dublicate) {
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      if (previewPath && fs.existsSync(previewPath)) fs.unlinkSync(previewPath);
+    try {
+      if (dublicate) {
+        fs.stat(filePath, (e) => {
+          if (e) {
+            throw new Error('File not found,', e);
+          } else
+            fs.unlink(filePath, (e) => {
+              if (e) {
+                throw new Error('Cannot remove file,', e);
+              }
+            });
+        });
+        if (previewPath) {
+          fs.stat(previewPath, (e) => {
+            if (e) {
+              throw new Error('File not found,', e);
+            } else
+              fs.unlink(previewPath, (e) => {
+                if (e) {
+                  throw new Error('Cannot remove file,', e);
+                }
+              });
+          });
+        }
+      }
+    } catch {
       throw new ConflictException('This model already uploaded');
     }
 
@@ -172,7 +195,16 @@ export class ModelsService {
     if (model.authorId !== userId)
       throw new ForbiddenException('User have no access to this object');
 
-    if (fs.existsSync(model.file)) fs.unlinkSync(model.file);
+    fs.stat(model.file, (e) => {
+      if (e) {
+        throw new Error('Cannot remove file,', e);
+      } else
+        fs.unlink(model.file, (e) => {
+          if (e) {
+            throw new Error('Cannot remove file, ', e);
+          }
+        });
+    });
 
     return this.prisma.aiModel.delete({ where: { id } });
   }
