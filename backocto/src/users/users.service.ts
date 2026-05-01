@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -92,7 +96,7 @@ export class UsersService {
       },
     });
 
-    console.log(user);
+    //console.log(user);
     if (!user) throw new NotFoundException('User not found');
 
     const [
@@ -144,8 +148,40 @@ export class UsersService {
       },
     };
 
-    console.log(_return);
+    //console.log(_return);
 
     return _return;
+  }
+
+  async update(
+    user: number,
+    data: {
+      name?: string;
+      bio?: string;
+      avatar?: string;
+      banner?: string;
+    },
+  ) {
+    const existing = await this.prisma.user.findUnique({
+      where: { id: user },
+    });
+    if (!existing) throw new NotFoundException();
+    if (existing.id !== user)
+      throw new ForbiddenException('You have no access to this object');
+
+    const updated = await this.prisma.user.update({
+      where: { id: existing.id },
+      data: {
+        profile: {
+          update: {
+            ...(data.bio !== undefined && { bio: data.bio }),
+            ...(data.avatar !== undefined && { avatar: data.avatar }),
+            ...(data.banner !== undefined && { banner: data.banner }),
+          },
+        },
+      },
+      include: { profile: true },
+    });
+    return updated;
   }
 }
