@@ -12,6 +12,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { extractAIMetadata } from '../common/utils/ai-metadata.parser';
 import { UpdateImageDto } from './dto/update-image.dto';
 import fs from 'fs/promises';
+import { BaseQueryDto } from '../common/dto/query-params.dto';
 
 @Injectable()
 export class ImagesService {
@@ -28,24 +29,25 @@ export class ImagesService {
     return `${this.backendUrl}/${cleanPath}`;
   }
 
-  private mapImage(img: any) {
+  private mapImage(img: any, currentUserId?: number) {
     return {
       ...img,
       image: this.getFileUrl(img.image),
       is_published: img.isPublished,
       likes_count: img.likes_count ?? img._count?.likes ?? 0,
-      author: img.author
-        ? {
-            ...img.author,
-            profile: img.author.profile
-              ? {
-                  ...img.author.profile,
-                  avatar: this.getFileUrl(img.author.profile.avatar),
-                  bio: img.author.bio,
-                }
-              : null,
-          }
-        : null,
+      is_liked: currentUserId ? img.likes?.length > 0 : false,
+      created_at: img.createdAt,
+      author: {
+        id: img.authorId,
+        username: img.author.username,
+        profile: {
+          username: img.author.username,
+          bio: img.author?.profile.bio ?? '',
+          avatar: this.getFileUrl(img.author.profile.avatar),
+        },
+        followers_count: img.author._count.followers || 0,
+        is_following: false,
+      },
       tags: img.tags?.map((t: any) => t.name) || [],
     };
   }
@@ -95,29 +97,81 @@ export class ImagesService {
     }
   }
 
-  async findAll() {
-    const images = await this.prisma.generatedImage.findMany({
-      where: { isPublished: true },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            profile: { select: { avatar: true } },
+  async findAll(query: BaseQueryDto, currentUserId?: number) {
+    const { ordering, author, tag, created_after, feed } = query;
+
+    const where: any = {};
+
+    if (currentUserId) {
+      where.OR = [{ isPublished: true }, { authorId: currentUserId }];
+    } else {
+      where.isPublished = true;
+    }
+
+    if (author) {
+      where.authorId = Number(author);
+    }
+
+    if (tag) {
+      where.tags = { some: { name: tag } };
+    }
+
+    if (created_after) {
+      where.createdAt = { gte: new Date(created_after) };
+    }
+
+    if (feed === 'following' && currentUserId) {
+      where.author = {
+        followers: { some: { followerId: currentUserId } },
+      };
+    }
+
+    let orderBy: any = { createdAt: 'desc' };
+
+    if (ordering) {
+      const isDesc = ordering.startsWith('-');
+      const field = isDesc ? ordering.substring(1) : ordering;
+
+      const fieldMap: Record<string, string> = {
+        created_at: 'createdAt',
+        likes_count: 'likesCount',
+        downloads_count: 'downloadsCount',
+        rating: 'likesCount',
+      };
+
+      const prismaField = fieldMap[field] || field;
+      orderBy = { [prismaField]: isDesc ? 'desc' : 'asc' };
+    }
+
+    const [items, count] = await Promise.all([
+      this.prisma.generatedImage.findMany({
+        where,
+        orderBy,
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              followers: true,
+              profile: { select: { avatar: true } },
+              _count: { select: { followers: true } },
+            },
           },
+          likes: currentUserId ? { where: { userId: currentUserId } } : false,
+          tags: true,
+          _count: { select: { comments: true, likes: true } },
         },
-        tags: true,
-        _count: { select: { comments: true, likes: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+      }),
+      this.prisma.generatedImage.count({ where }),
+    ]);
 
-    const results = images.map((img) => this.mapImage(img));
-
-    return { count: results.length, results };
+    return {
+      count,
+      results: items.map((img) => this.mapImage(img, currentUserId)),
+    };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, currentUserId?: number) {
     const img = await this.prisma.generatedImage.findUnique({
       where: { id },
       include: {
@@ -126,14 +180,21 @@ export class ImagesService {
             id: true,
             username: true,
             profile: { select: { avatar: true } },
+            _count: { select: { followers: true } },
           },
         },
+        likes: currentUserId
+          ? {
+              where: { userId: currentUserId },
+            }
+          : false,
+        _count: { select: { likes: true } },
         tags: true,
         linkedModel: true,
       },
     });
     if (!img) throw new NotFoundException('Image not found');
-    return this.mapImage(img);
+    return this.mapImage(img, currentUserId);
   }
 
   async update(id: number, userId: number, dto: UpdateImageDto) {
@@ -162,7 +223,18 @@ export class ImagesService {
           },
         }),
       },
-      include: { tags: true },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            followers: true,
+            profile: { select: { avatar: true } },
+            _count: { select: { followers: true } },
+          },
+        },
+        tags: true,
+      },
     });
     return this.mapImage(updated);
   }

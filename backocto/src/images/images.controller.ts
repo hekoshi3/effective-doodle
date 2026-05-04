@@ -14,6 +14,7 @@ import {
   Param,
   Body,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -24,19 +25,40 @@ import {
   userDirectoryPath,
 } from '../common/utils/file-upload.utils';
 import { UpdateImageDto } from './dto/update-image.dto';
+import { OptionalJwtAuthGuard } from '../users/guards/users.guard';
+import { BaseQueryDto } from '../common/dto/query-params.dto';
 
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
   @Get()
-  async getImages() {
-    return this.imagesService.findAll();
+  @UseGuards(OptionalJwtAuthGuard)
+  async getImages(@Query() query: BaseQueryDto, @Req() req: any) {
+    return this.imagesService.findAll(query, req.user?.userId);
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const folderHundler = userDirectoryPath('images');
+          void folderHundler(req, file, cb);
+        },
+        filename: editFileName,
+      }),
+    }),
+  )
+  async uploadImage(@UploadedFile() file: Express.Multer.File, @Req() req) {
+    return this.imagesService.create(req.user.userId, file.path, req.body);
   }
 
   @Get(':id/')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.imagesService.findOne(id);
+  @UseGuards(OptionalJwtAuthGuard)
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.imagesService.findOne(id, req.user?.userId);
   }
 
   @Patch(':id/')
@@ -53,19 +75,5 @@ export class ImagesController {
   @UseGuards(JwtAuthGuard)
   remove(@Param('id', ParseIntPipe) id: number, @Req() req) {
     return this.imagesService.remove(id, req.user.userId);
-  }
-
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: userDirectoryPath('images'),
-        filename: editFileName,
-      }),
-    }),
-  )
-  async uploadImage(@UploadedFile() file: Express.Multer.File, @Req() req) {
-    return this.imagesService.create(req.user.userId, file.path, req.body);
   }
 }
