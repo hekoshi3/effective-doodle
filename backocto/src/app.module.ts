@@ -10,6 +10,11 @@ import { ConfigModule } from './config/config.module';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
+import { FollowsModule } from './follows/follows.module';
+import { LikesController } from './likes/likes.controller';
+import { LikesService } from './likes/likes.service';
+import { LikesModule } from './likes/likes.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -24,8 +29,11 @@ import { UsersService } from './users/users.service';
     ModelsModule,
     ConfigModule,
     UsersModule,
+    FollowsModule,
+    LikesModule,
+    CommentsModule,
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService],
+  controllers: [AppController, UsersController, LikesController],
+  providers: [AppService, UsersService, LikesService],
 })
 export class AppModule {}
