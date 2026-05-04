@@ -1,12 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import fs from 'fs/promises';
-import { extname } from 'path';
+import path, { extname } from 'path';
 
-export const editFileName = (file: any, callback: any) => {
-  const name = file.originalname.split('.')[0];
+export const editFileName = (
+  req: any,
+  file: Express.Multer.File,
+  callback: any,
+) => {
+  const name = path.parse(file.originalname).name;
   const fileExtName = extname(file.originalname);
 
   const randomName = Array(4)
