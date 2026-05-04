@@ -105,7 +105,7 @@ export function ImageEditPage() {
             const res = await makeAuthenticatedRequest(`${API_HOST}/images/${image.id}/`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ description, tags }),
+                body: JSON.stringify({ description, tags, is_published: false }),
             });
             if (!res.ok) throw new Error("Failed to save");
             const updated = await res.json();
