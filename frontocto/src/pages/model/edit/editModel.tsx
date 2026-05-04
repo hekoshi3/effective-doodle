@@ -54,7 +54,7 @@ export function ModelEditPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <div className="flex flex-col gap-4">
                         <div className="relative aspect-video bg-neutral-800 rounded-2xl overflow-hidden border border-neutral-700">
-                            {modelData.featured_image ? (
+                            {modelData.featured_image_url ? (
                                 <Image src={modelData.featured_image_url} alt="Model preview" fill className="object-cover" />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-neutral-500">No Preview Image</div>

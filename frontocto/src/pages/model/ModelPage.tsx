@@ -172,7 +172,7 @@ export function ModelDetailPage() {
                     <div className="flex flex-col gap-6">
                         <div className="relative w-full aspect-square bg-neutral-800 rounded-2xl overflow-hidden border border-neutral-700 shadow-2xl">
                             <Image
-                                src={model.featured_image_url || "/image404.png"}
+                                src={model.featured_image_url}
                                 alt={model.name}
                                 fill
                                 className="object-cover"
