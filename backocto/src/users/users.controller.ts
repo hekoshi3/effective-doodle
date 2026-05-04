@@ -55,7 +55,7 @@ export class UsersController {
             const subFolder =
               file.fieldname === 'avatar' ? 'avatars' : 'banners';
             const folderHundler = userDirectoryPath(subFolder);
-            folderHundler(req, file, cb);
+            void folderHundler(req, file, cb);
           },
         }),
       },
@@ -67,7 +67,6 @@ export class UsersController {
     files: { avatar?: Express.Multer.File[]; banner?: Express.Multer.File[] },
     @Req() req: any,
   ) {
-    console.log('got PATCH', dto, files);
     const avatarPath = files.avatar?.[0]?.path?.replace(/\\/g, '/');
     const bannerPath = files.banner?.[0]?.path?.replace(/\\/g, '/');
     return this.usersServive.update(req.user.userId, {
