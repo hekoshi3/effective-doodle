@@ -103,7 +103,7 @@ export function MainPage() {
                 const url = `${API_HOST}/images/?${params.toString()}`;
                 const res = auth.token && !auth.isLoading ? await makeAuthenticatedRequest(url) : await fetch(url);
                 const data: BackdendResIMG = await res.json();
-                setGallery(data.results.filter(img => img.is_published));
+                setGallery(data?.results?.filter(img => img.is_published) || []);
             } catch (e) { console.error(e); }
         };
         if (!auth.isLoading) fetchGallery();
@@ -126,7 +126,7 @@ export function MainPage() {
                 const url = `${API_HOST}/models/?${params.toString()}`;
                 const res = auth.token && !auth.isLoading ? await makeAuthenticatedRequest(url) : await fetch(url);
                 const data: BackdendResMODEL = await res.json();
-                setModels(data.results.filter(m => m.is_published));
+                setModels(data?.results?.filter(m => m.is_published) || []);
             } catch (e) { console.error(e); }
         };
         if (!auth.isLoading) fetchModels();
