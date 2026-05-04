@@ -12,6 +12,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UploadedFiles,
@@ -27,19 +28,23 @@ import {
   editFileName,
 } from '../common/utils/file-upload.utils';
 import { UpdateModelDto } from './dto/update-model.dto';
+import { OptionalJwtAuthGuard } from '../users/guards/users.guard';
+import { BaseQueryDto } from '../common/dto/query-params.dto';
 
 @Controller('models')
 export class ModelsController {
   constructor(private readonly modelsService: ModelsService) {}
 
   @Get()
-  async getModels() {
-    return this.modelsService.findAll();
+  @UseGuards(OptionalJwtAuthGuard)
+  async getModels(@Query() query: BaseQueryDto, @Req() req: any) {
+    return this.modelsService.findAll(query, req.user?.userId);
   }
 
   @Get(':id/')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.modelsService.findOne(id);
+  @UseGuards(OptionalJwtAuthGuard)
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.modelsService.findOne(id, req.user?.userId);
   }
 
   @Patch(':id/')
@@ -68,13 +73,16 @@ export class ModelsController {
       ],
       {
         storage: diskStorage({
-          destination: userDirectoryPath('models'),
+          destination: (req, file, cb) => {
+            const folderHundler = userDirectoryPath('models');
+            void folderHundler(req, file, cb);
+          },
           filename: editFileName,
         }),
       },
     ),
   )
-  async uploadImage(
+  async uploadModel(
     @UploadedFiles()
     files: { file?: Express.Multer.File[]; image?: Express.Multer.File[] },
     @Body() dto: any,
