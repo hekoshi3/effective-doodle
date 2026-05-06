@@ -8,4 +8,5 @@ export class BaseQueryDto {
   @IsOptional() @IsString() feed?: string;
   @IsOptional() @IsString() model_type?: string;
   @IsOptional() @IsString() download_count?: string;
+  @IsOptional() @IsString() search?: string;
 }
