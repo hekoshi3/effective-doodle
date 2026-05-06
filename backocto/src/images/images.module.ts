@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { ImagesController } from './images.controller';
 import { MulterModule } from '@nestjs/platform-express';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { MulterModule } from '@nestjs/platform-express';
       }),
     }),
   ],
-  providers: [ImagesService],
+  providers: [ImagesService, NotificationsService],
   controllers: [ImagesController],
 })
 export class ImagesModule {}

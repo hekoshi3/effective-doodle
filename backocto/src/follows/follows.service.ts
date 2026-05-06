@@ -4,10 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class FollowsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifService: NotificationsService,
+  ) {}
 
   async toggleFollow(followerId: number, followingId: number) {
     if (followerId === followingId)
@@ -45,7 +49,11 @@ export class FollowsService {
         },
       });
 
-      // !!! notifications
+      await this.notifService.create({
+        recipientId: followingId,
+        actorId: followerId,
+        type: 'FOLLOW',
+      });
 
       return { status: 'followed', is_following: true };
     }

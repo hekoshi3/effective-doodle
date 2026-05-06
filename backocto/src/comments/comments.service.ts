@@ -5,13 +5,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CommentDto } from './dto/comments.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class CommentsService {
-  private readonly backendUrl =
-    process.env.BACKEND_URL! + ':' + process.env.BACKEND_PORT! ||
-    'http://127.0.0.1:5001';
-  constructor(private prisma: PrismaService) {}
+  private readonly backendUrl = process.env.BACKEND_URL
+    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
+    : 'http://127.0.0.1:5001';
+  constructor(
+    private prisma: PrismaService,
+    private notifService: NotificationsService,
+  ) {}
 
   getFileUrl(path: string | null): string | null {
     if (!path) return null;
@@ -59,12 +63,51 @@ export class CommentsService {
       },
       include: {
         user: { include: { profile: true } },
+        image: { select: { authorId: true } },
+        model: { select: { authorId: true } },
       },
     });
 
-    const mentionedUsers = text.match(/@(\w+)/g);
-    if (mentionedUsers) {
-      console.log(`Found user mentions: ${mentionedUsers.join(', ')}`);
+    const regex = /@(\w+)/g;
+    const matches = [...text.matchAll(regex)];
+    const usernames = matches.map((match) => match[1]);
+    const postAuthorId = comment.image?.authorId || comment.model?.authorId;
+    if (usernames.length > 0) {
+      const mentionedUsers = await this.prisma.user.findMany({
+        where: {
+          username: { in: usernames, mode: 'insensitive' },
+        },
+        select: { id: true },
+      });
+
+      const recipientIds = mentionedUsers
+        .map((u) => u.id)
+        .filter((id) => id !== userId && id !== postAuthorId);
+
+      if (recipientIds.length > 0) {
+        this.notifService
+          .createManyMentions({
+            recipientIds,
+            actorId: userId,
+            commentId: comment.id,
+            imageId: image,
+            modelId: aimodel,
+          })
+          .catch((e) => console.error('Mention notification error:', e));
+      }
+    }
+
+    if (postAuthorId && postAuthorId !== userId) {
+      this.notifService
+        .create({
+          recipientId: postAuthorId,
+          actorId: userId,
+          type: 'COMMENT',
+          commentId: comment.id,
+          imageId: image,
+          modelId: aimodel,
+        })
+        .catch((e) => console.error('Author notification error:', e));
     }
 
     return this.mapComment(comment);

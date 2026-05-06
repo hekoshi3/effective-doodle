@@ -13,13 +13,17 @@ import { extractAIMetadata } from '../common/utils/ai-metadata.parser';
 import { UpdateImageDto } from './dto/update-image.dto';
 import fs from 'fs/promises';
 import { BaseQueryDto } from '../common/dto/query-params.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ImagesService {
-  private readonly backendUrl =
-    process.env.BACKEND_URL! + ':' + process.env.BACKEND_PORT! ||
-    'http://127.0.0.1:5001';
-  constructor(private prisma: PrismaService) {}
+  private readonly backendUrl = process.env.BACKEND_URL
+    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
+    : 'http://127.0.0.1:5001';
+  constructor(
+    private prisma: PrismaService,
+    private notifService: NotificationsService,
+  ) {}
 
   getFileUrl(path: string | null): string | null {
     if (!path) return null;
@@ -45,7 +49,7 @@ export class ImagesService {
           bio: img.author?.profile.bio ?? '',
           avatar: this.getFileUrl(img.author.profile.avatar),
         },
-        followers_count: img.author._count.followers || 0,
+        followers_count: img.author._count?.followers || 0,
         is_following: false,
       },
       tags: img.tags?.map((t: any) => t.name) || [],
@@ -90,6 +94,13 @@ export class ImagesService {
           tags: true,
         },
       });
+
+      if (result.isPublished) {
+        this.notifService
+          .notifyFollowers(userId, 'NEW_POST', { imageId: result.id })
+          .catch((e) => console.error('Notification background error:', e)); // Безопасный перехват
+      }
+
       return this.mapImage(result);
     } catch (e) {
       console.error('[Error] Prisma Create failed:', e);
@@ -98,26 +109,38 @@ export class ImagesService {
   }
 
   async findAll(query: BaseQueryDto, currentUserId?: number) {
-    const { ordering, author, tag, created_after, feed } = query;
+    const { ordering, author, tag, created_after, feed, search } = query;
 
-    const where: any = {};
+    const where: any = {
+      AND: [
+        currentUserId
+          ? { OR: [{ isPublished: true }, { authorId: currentUserId }] }
+          : { isPublished: true },
+      ],
+    };
 
-    if (currentUserId) {
-      where.OR = [{ isPublished: true }, { authorId: currentUserId }];
-    } else {
-      where.isPublished = true;
+    if (search) {
+      where.AND.push({
+        OR: [
+          { description: { contains: search, mode: 'insensitive' } },
+          { author: { username: { contains: search, mode: 'insensitive' } } },
+          {
+            tags: { some: { name: { contains: search, mode: 'insensitive' } } },
+          },
+        ],
+      });
     }
 
     if (author) {
-      where.authorId = Number(author);
+      where.AND.push({ authorId: Number(author) });
     }
 
     if (tag) {
-      where.tags = { some: { name: tag } };
+      where.AND.push({ tags: { some: { name: tag } } });
     }
 
     if (created_after) {
-      where.createdAt = { gte: new Date(created_after) };
+      where.AND.push({ createdAt: { gte: new Date(created_after) } });
     }
 
     if (feed === 'following' && currentUserId) {
@@ -152,7 +175,6 @@ export class ImagesService {
             select: {
               id: true,
               username: true,
-              followers: true,
               profile: { select: { avatar: true } },
               _count: { select: { followers: true } },
             },
@@ -228,7 +250,6 @@ export class ImagesService {
           select: {
             id: true,
             username: true,
-            followers: true,
             profile: { select: { avatar: true } },
             _count: { select: { followers: true } },
           },
@@ -236,6 +257,13 @@ export class ImagesService {
         tags: true,
       },
     });
+
+    if (updated.isPublished) {
+      this.notifService
+        .notifyFollowers(userId, 'NEW_POST', { imageId: updated.id })
+        .catch((e) => console.error('Notification background error:', e)); // Безопасный перехват
+    }
+
     return this.mapImage(updated);
   }
 

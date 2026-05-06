@@ -7,9 +7,9 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  private readonly backendUrl =
-    process.env.BACKEND_URL! + ':' + process.env.BACKEND_PORT! ||
-    'http://127.0.0.1:5001';
+  private readonly backendUrl = process.env.BACKEND_URL
+    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
+    : 'http://127.0.0.1:5001';
   constructor(private prisma: PrismaService) {}
 
   getFileUrl(path: string | null): string | null {

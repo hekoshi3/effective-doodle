@@ -14,13 +14,17 @@ import { getFileHash } from '../common/utils/file-hash.utils';
 import fs from 'fs/promises';
 import { UpdateModelDto } from './dto/update-model.dto';
 import { BaseQueryDto } from '../common/dto/query-params.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ModelsService {
-  private readonly backendUrl =
-    process.env.BACKEND_URL! + ':' + process.env.BACKEND_PORT! ||
-    'http://127.0.0.1:5001';
-  constructor(private prisma: PrismaService) {}
+  private readonly backendUrl = process.env.BACKEND_URL
+    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
+    : 'http://127.0.0.1:5001';
+  constructor(
+    private prisma: PrismaService,
+    private notifService: NotificationsService,
+  ) {}
 
   getFileUrl(path: string | null): string | null {
     if (!path) return null;
@@ -49,10 +53,9 @@ export class ModelsService {
         username: model.author.username,
         profile: {
           username: model.author.username,
-          bio: model.author?.profile.bio ?? '',
           avatar: this.getFileUrl(model.author.profile.avatar),
         },
-        followers_count: model.author._count.followers || 0,
+        followers_count: model.author._count?.followers || 0,
         is_following: false,
       },
       tags: model.tags?.map((t: any) => t.name) || [],
@@ -69,16 +72,9 @@ export class ModelsService {
     const dublicate = await this.prisma.aiModel.findFirst({
       where: { fileHash },
     });
-    try {
-      if (dublicate) {
-        await fs.access(filePath);
-        await fs.unlink(filePath);
-        if (previewPath) {
-          await fs.stat(previewPath);
-          await fs.unlink(previewPath);
-        }
-      }
-    } catch {
+    if (dublicate) {
+      if (filePath) await fs.unlink(filePath).catch(() => {});
+      if (previewPath) await fs.unlink(previewPath).catch(() => {});
       throw new ConflictException('This model already uploaded');
     }
 
@@ -88,7 +84,7 @@ export class ModelsService {
       .map((t) => t.trim())
       .filter(Boolean);
 
-    return this.prisma.aiModel.create({
+    const result = await this.prisma.aiModel.create({
       data: {
         name: dto.name,
         file: filePath.replace(/\\/g, '/'),
@@ -118,29 +114,50 @@ export class ModelsService {
       },
       include: { tags: true, author: true, featuredImage: true },
     });
+
+    if (result.isPublished) {
+      this.notifService
+        .notifyFollowers(userId, 'NEW_POST', { modelId: result.id })
+        .catch((e) => console.error('Notification background error:', e));
+    }
+
+    return this.mapModel(result);
   }
 
   async findAll(query: BaseQueryDto, currentUserId?: number) {
-    const { ordering, author, tag, created_after, feed, model_type } = query;
+    const { ordering, author, tag, created_after, feed, model_type, search } =
+      query;
 
-    const where: any = {};
+    const where: any = {
+      AND: [
+        currentUserId
+          ? { OR: [{ isPublished: true }, { authorId: currentUserId }] }
+          : { isPublished: true },
+      ],
+    };
 
-    if (currentUserId) {
-      where.OR = [{ isPublished: true }, { authorId: currentUserId }];
-    } else {
-      where.isPublished = true;
+    if (search) {
+      where.AND.push({
+        OR: [
+          { description: { contains: search, mode: 'insensitive' } },
+          { author: { username: { contains: search, mode: 'insensitive' } } },
+          {
+            tags: { some: { name: { contains: search, mode: 'insensitive' } } },
+          },
+        ],
+      });
     }
 
     if (author) {
-      where.authorId = Number(author);
+      where.AND.push({ authorId: Number(author) });
     }
 
     if (tag) {
-      where.tags = { some: { name: tag } };
+      where.AND.push({ tags: { some: { name: tag } } });
     }
 
     if (created_after) {
-      where.createdAt = { gte: new Date(created_after) };
+      where.AND.push({ createdAt: { gte: new Date(created_after) } });
     }
 
     if (feed === 'following' && currentUserId) {
@@ -178,7 +195,6 @@ export class ModelsService {
             select: {
               id: true,
               username: true,
-              followers: true,
               profile: { select: { avatar: true } },
               _count: { select: { followers: true } },
             },
@@ -256,7 +272,6 @@ export class ModelsService {
           select: {
             id: true,
             username: true,
-            followers: true,
             profile: { select: { avatar: true } },
             _count: { select: { followers: true } },
           },
@@ -264,6 +279,13 @@ export class ModelsService {
         tags: true,
       },
     });
+
+    if (updated.isPublished) {
+      this.notifService
+        .notifyFollowers(userId, 'NEW_POST', { modelId: updated.id })
+        .catch((e) => console.error('Notification background error:', e));
+    }
+
     return this.mapModel(updated);
   }
 

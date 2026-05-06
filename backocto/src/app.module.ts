@@ -15,6 +15,8 @@ import { LikesController } from './likes/likes.controller';
 import { LikesService } from './likes/likes.service';
 import { LikesModule } from './likes/likes.module';
 import { CommentsModule } from './comments/comments.module';
+import { TagsModule } from './tags/tags.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { CommentsModule } from './comments/comments.module';
     FollowsModule,
     LikesModule,
     CommentsModule,
+    TagsModule,
+    NotificationsModule,
   ],
   controllers: [AppController, UsersController, LikesController],
   providers: [AppService, UsersService, LikesService],

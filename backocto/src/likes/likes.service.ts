@@ -4,10 +4,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { LikesDto } from './dto/likes.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class LikesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifService: NotificationsService,
+  ) {}
 
   async toggleLike(userId: number, dto: LikesDto) {
     const { image, aimodel } = dto;
@@ -41,7 +45,18 @@ export class LikesService {
         const updated = await (tx[targetTable] as any).update({
           where: { id: targetId },
           data: { likesCount: { increment: 1 } },
+          select: { likesCount: true, authorId: true },
         });
+
+        if (updated.authorId !== userId) {
+          await this.notifService.create({
+            recipientId: updated.authorId,
+            actorId: userId,
+            type: 'LIKE',
+            imageId: image || undefined,
+            modelId: aimodel || undefined,
+          });
+        }
 
         return { status: 'liked', likes_count: updated.likesCount };
       });
