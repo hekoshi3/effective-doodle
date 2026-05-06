@@ -30,7 +30,7 @@ export const NotificationBell = () => {
         fetchNotifications();
         const interval = setInterval(fetchNotifications, 60000);
         return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [auth.token]);
 
     const markAsRead = async (e: React.MouseEvent, id: number) => {
@@ -80,7 +80,7 @@ export const NotificationBell = () => {
                     )}
                 </div>
             </summary>
-            
+
             <ul className="dropdown-content z-100 mt-3 p-2 shadow-2xl bg-neutral-800 border border-neutral-700 rounded-xl w-80 sm:w-96 flex flex-col gap-1 max-h-125 overflow-y-auto overflow-x-hidden">
                 <li className="p-3 border-b border-neutral-700 flex justify-between items-center sticky top-0 bg-neutral-800 z-10">
                     <span className="font-bold text-white">Notifications</span>
@@ -90,17 +90,17 @@ export const NotificationBell = () => {
                         </span>
                     )}
                 </li>
-                
+
                 <div className="flex flex-col w-full">
                     {notifications.length === 0 ? (
                         <div className="p-10 text-center text-sm text-neutral-500 italic">No notifications yet</div>
                     ) : (
-                        notifications.map((n) => ( console.log(n),
+                        notifications.map((n) => (
                             <li key={n.id} className={`flex flex-col w-full border-b border-neutral-700/30 last:border-0 ${!n.is_read ? 'bg-accent/5' : ''}`}>
                                 <div className="p-4 flex items-start gap-3 w-full relative">
                                     <Link href={`/user/${n.actor.username}`} className="shrink-0">
-                                        <Image 
-                                            src={n.actor.profile.avatar || "/img/nacho.png"} 
+                                        <Image
+                                            src={n.actor.profile.avatar || "/img/nacho.png"}
                                             alt="" width={40} height={40}
                                             className="rounded-full border h-10 w-10 object-cover border-neutral-600"
                                         />
@@ -121,7 +121,7 @@ export const NotificationBell = () => {
                                     </div>
 
                                     {!n.is_read && (
-                                        <button 
+                                        <button
                                             onClick={(e) => markAsRead(e, n.id)}
                                             className="shrink-0 w-6 h-6 rounded-full bg-neutral-700 hover:bg-accent hover:text-black flex items-center justify-center transition-all shadow-lg"
                                             title="Mark as read"

@@ -18,7 +18,6 @@ export const NavbarSearch = () => {
     const [isLoading, setIsLoading] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
 
-    // Закрытие при клике вне области поиска
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -29,7 +28,6 @@ export const NavbarSearch = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Поиск при изменении запроса (с задержкой/debounce)
     useEffect(() => {
         if (query.length < 2) {
             setResults({ images: [], models: [] });
@@ -40,7 +38,6 @@ export const NavbarSearch = () => {
         const timer = setTimeout(async () => {
             setIsLoading(true);
             try {
-                // Выполняем два запроса параллельно
                 const [imgRes, modelRes] = await Promise.all([
                     fetch(`${API_HOST}/images/?search=${query}`),
                     fetch(`${API_HOST}/models/?search=${query}`)
@@ -50,7 +47,7 @@ export const NavbarSearch = () => {
                 const modelData = await modelRes.json();
 
                 setResults({
-                    images: imgData.results.slice(0, 4), // Берем первые 4
+                    images: imgData.results.slice(0, 4),
                     models: modelData.results.slice(0, 4)
                 });
                 setIsOpen(true);
@@ -59,7 +56,7 @@ export const NavbarSearch = () => {
             } finally {
                 setIsLoading(false);
             }
-        }, 400); // Ждем 400мс после последнего нажатия клавиши
+        }, 400);
 
         return () => clearTimeout(timer);
     }, [query]);
@@ -68,8 +65,6 @@ export const NavbarSearch = () => {
         e.preventDefault();
         if (query.trim()) {
             setIsOpen(false);
-            // Если нужно переходить на отдельную страницу поиска:
-            // router.push(`/search?q=${encodeURIComponent(query)}`);
         }
     };
 
@@ -95,11 +90,9 @@ export const NavbarSearch = () => {
                 </div>
             </form>
 
-            {/* Выпадающий список результатов */}
             {isOpen && (results.images.length > 0 || results.models.length > 0) && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden z-[1000]">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden z-1000">
                     
-                    {/* Секция Моделей */}
                     {results.models.length > 0 && (
                         <div className="p-2 border-b border-neutral-700">
                             <span className="text-[10px] uppercase font-bold text-neutral-500 px-2">Models</span>
@@ -110,7 +103,7 @@ export const NavbarSearch = () => {
                                     onClick={() => {setIsOpen(false); setQuery("")}}
                                     className="flex items-center gap-3 p-2 hover:bg-neutral-700 rounded-lg transition-colors group"
                                 >
-                                    <div className="relative w-10 h-10 flex-shrink-0 bg-neutral-900 rounded overflow-hidden">
+                                    <div className="relative w-10 h-10 shrink-0 bg-neutral-900 rounded overflow-hidden">
                                         <Image src={model.featured_image_url || "/image404.png"} alt="" fill className="object-cover" />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -122,7 +115,6 @@ export const NavbarSearch = () => {
                         </div>
                     )}
 
-                    {/* Секция Изображений */}
                     {results.images.length > 0 && (
                         <div className="p-2">
                             <span className="text-[10px] uppercase font-bold text-neutral-500 px-2">Images</span>
@@ -152,9 +144,8 @@ export const NavbarSearch = () => {
                 </div>
             )}
 
-            {/* Ничего не найдено */}
             {isOpen && query.length >= 2 && results.images.length === 0 && results.models.length === 0 && !isLoading && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-800 border border-neutral-700 rounded-xl p-4 text-center text-sm text-neutral-500 z-[1000]">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-800 border border-neutral-700 rounded-xl p-4 text-center text-sm text-neutral-500 z-1000">
                     No results for &quot;{query}&quot;
                 </div>
             )}
