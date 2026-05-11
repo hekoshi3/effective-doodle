@@ -6,7 +6,7 @@ import {
   IsNumber,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { AiModelType } from '@prisma/client';
+import { AiModelType } from '../../generated/prisma/client';
 
 export class UpdateModelDto {
   @IsOptional()
