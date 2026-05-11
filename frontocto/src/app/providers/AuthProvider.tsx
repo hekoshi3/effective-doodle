@@ -90,18 +90,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (username: string, email: string, password: string) => {
+  const register = async (username: string, password: string) => {
     try {
       const response = await fetch(`${API_HOST}/register/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
         const error = await response.json();
         throw new Error(
-          error.username?.[0] || error.email?.[0] || error.password?.[0] || error.message || "Unknown error"
+          error.username?.[0] || error.password?.[0] || error.message || "Unknown error"
         );
       }
 

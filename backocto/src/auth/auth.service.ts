@@ -19,11 +19,11 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const existingUser = await this.prisma.user.findFirst({
-      where: { OR: [{ email: dto.email }, { username: dto.username }] },
+      where: { OR: [{ username: dto.username }] },
     });
 
     if (existingUser) {
-      throw new ConflictException('This nickname or email is taken');
+      throw new ConflictException('This nickname is taken');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -31,7 +31,6 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         username: dto.username,
-        email: dto.email,
         password: hashedPassword,
         profile: {
           create: {},

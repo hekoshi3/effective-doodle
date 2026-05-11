@@ -36,22 +36,6 @@ export function AuthPage() {
             />
           </div>
 
-          {!isLogin && (
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-neutral-300 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your email"
-              />
-            </div>
-          )}
-
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-neutral-300 mb-1">
               Password

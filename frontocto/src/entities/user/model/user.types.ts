@@ -2,7 +2,6 @@ export interface User {
   id: number;
   role: "User" | "Admin";
   username: string;
-  email: string;
   first_name: string;
   last_name: string;
   bio: string;

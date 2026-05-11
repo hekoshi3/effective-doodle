@@ -133,7 +133,6 @@ export class UsersService {
     const _return = {
       id: user.id,
       username: user.username,
-      email: user.email,
       first_name: '',
       last_name: '',
       bio: user.profile?.bio || '',

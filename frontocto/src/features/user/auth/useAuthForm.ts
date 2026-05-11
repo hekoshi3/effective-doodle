@@ -23,12 +23,11 @@ export function useAuthForm() {
 
     const username = formData.get("username") as string;
     const password = formData.get("password") as string;
-    const email = formData.get("email") as string;
 
     try {
       const result = isLogin
         ? await login(username, password)
-        : await register(username, email, password);
+        : await register(username, password);
 
       if (result.success && result.user?.username) {
         router.push(`/user/${result.user?.username}`);
