@@ -21,6 +21,6 @@ export class MediaService {
       ? cleanPath
       : `/${cleanPath}`;
 
-    return `${this.backendUrl}${normalizedPath}`;
+    return `${normalizedPath}`;
   }
 }
