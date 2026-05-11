@@ -13,7 +13,7 @@ export function SettingsProfile() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedAvatarImage, setselectedAvatarImage] = useState<File | null>(null);
     const [selectedBannerImage, setSelectedBannerImage] = useState<File | null>(null);
-    const [userBioText, setUserBioText] = useState<string>("");
+    const [, setUserBioText] = useState<string>("");
 
     const avatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -29,7 +29,7 @@ export function SettingsProfile() {
         }
     };
 
-    const bioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const bioChange = () => {
         let text;
         if (text && text > 0) {
             setUserBioText(text);
@@ -48,10 +48,9 @@ export function SettingsProfile() {
         const rawFormData = {
             avatar: e.get('avatar'),
             banner: e.get('banner'),
-            name: e.get('name'),
             bio: e.get('bio'),
         }
-        if (!selectedAvatarImage && !selectedBannerImage && !rawFormData.bio && !rawFormData.name && isSubmitting) return;
+        if (!selectedAvatarImage && !selectedBannerImage && !rawFormData.bio && isSubmitting) return;
         //console.log("goes forward, "+ selectedAvatarImage + selectedBannerImage + rawFormData.bio + rawFormData.name)
 
         setIsSubmitting(true);
@@ -59,7 +58,6 @@ export function SettingsProfile() {
         if (selectedAvatarImage) form.append("avatar", selectedAvatarImage);
         if (selectedBannerImage) form.append("banner", selectedBannerImage);
         if (rawFormData.bio) form.append("bio", rawFormData.bio)
-        if (rawFormData.name) form.append("name", rawFormData.name)
 
         //console.log("goes next, "+ selectedAvatarImage + selectedBannerImage + form.get('name') + form.get('bio'))
 
@@ -74,15 +72,6 @@ export function SettingsProfile() {
                 console.error("Server error:", errorData);
                 throw new Error("Upload failed");
             }
-
-            /*const data = await res.json();
-
-            if (data && data.id) {
-                router.push(`/image/edit/${data.id}`);
-            } else {
-                console.error("ID not found in response:", data);
-                throw new Error("Server did not return image ID");
-            }*/
 
         } catch (e) {
             console.error("|| error:", e);
@@ -111,7 +100,7 @@ export function SettingsProfile() {
                         </li>
                         <li className="list-row flex justify-between items-center min-w-xl">
                             <div><p className="text-xl">Name</p></div>
-                            <input type="text" name="name" className="input bg-neutral-800" onChange={bioChange} disabled />
+                            <input type="text" name="name" className="input bg-neutral-800" onChange={bioChange} disabled title="You cannot change your username" />
                         </li>
                         <li className="list-row flex justify-between items-center min-w-xl">
                             <div><p className="text-xl">Bio</p></div>
