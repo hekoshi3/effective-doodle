@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { NotificationType } from '../generated/prisma';
+import { NotificationType } from '../generated/prisma/enums';
 import { MediaService } from '../common/media/media.service';
 
 type NotificationWithActor = Prisma.NotificationGetPayload<{
