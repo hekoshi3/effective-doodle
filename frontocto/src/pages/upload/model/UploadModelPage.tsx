@@ -22,7 +22,7 @@ export function ModelUploadPage() {
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     const [name, setName] = useState("");
     const [modelType, setModelType] = useState("checkpoint");
 
@@ -42,9 +42,7 @@ export function ModelUploadPage() {
         if (e.target.files?.[0]) {
             const file = e.target.files[0];
             setModelFile(file);
-            if (!name) {
-                setName(file.name.replace(/\.[^/.]+$/, ""));
-            }
+            setName(file.name.replace(/\.[^/.]+$/, ""));
         }
     };
 
@@ -52,15 +50,21 @@ export function ModelUploadPage() {
         e.preventDefault();
         if (!modelFile || !name || isSubmitting) return;
 
+        const max_filesize = 100 * 1024 * 1024; // 100MB
+
+        if (modelFile.size > max_filesize) {
+            alert(`Файл слишком большой (${(modelFile.size / 1024 / 1024).toFixed(2)} МБ). В данный момент мы поддерживаем модели до 100 МБ`)
+            return;
+        }
         setIsSubmitting(true);
         const form = new FormData();
-        
-        form.append("file", modelFile); 
+
+        form.append("file", modelFile);
         form.append("name", name);
         form.append("model_type", modelType);
-        
+
         if (previewImage) {
-            form.append("image", previewImage); 
+            form.append("image", previewImage);
         }
 
         try {
@@ -112,11 +116,11 @@ export function ModelUploadPage() {
                 <div className="flex flex-col gap-8 items-center">
                     <h1 className="text-3xl font-bold">Upload New Model</h1>
 
-                    <div className="w-full max-w-2xl flex flex-col gap-6">
-                        
+                    <form className="w-full max-w-2xl flex flex-col gap-6">
+
                         <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
                             <label className="block text-sm font-medium mb-2 text-neutral-400">Model Name *</label>
-                            <input 
+                            <input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -128,7 +132,7 @@ export function ModelUploadPage() {
 
                         <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
                             <label className="block text-sm font-medium mb-2 text-neutral-400">Model Type *</label>
-                            <select 
+                            <select
                                 value={modelType}
                                 onChange={(e) => setModelType(e.target.value)}
                                 className="select select-bordered w-full bg-neutral-700 border-neutral-600 focus:border-accent"
@@ -141,8 +145,8 @@ export function ModelUploadPage() {
 
                         <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
                             <label className="block text-sm font-medium mb-2 text-neutral-400">Model File *</label>
-                            <input 
-                                type="file" 
+                            <input
+                                type="file"
                                 onChange={handleModelFileChange}
                                 className="file-input file-input-bordered file-input-accent w-full bg-neutral-700"
                                 accept=".safetensors,.ckpt,.pt,.zip,.bin"
@@ -174,7 +178,7 @@ export function ModelUploadPage() {
                         >
                             {isSubmitting ? <span className="loading loading-spinner"></span> : "Upload and Continue"}
                         </button>
-                    </div>
+                    </form>
                 </div>
             </div>
         </main>
