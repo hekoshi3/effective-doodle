@@ -7,7 +7,8 @@ export class MediaService {
 
   constructor(private configService: ConfigService) {
     const url = this.configService.get<string>('BACKEND_URL', '127.0.0.1');
-    const port = this.configService.get<string>('BACKEND_PORT', '5001');
+    // Use BACKEND_PORT if Frontend is not configured for pattern BFF
+    const port = this.configService.get<string>('FRONTEND_PORT', '5001');
 
     this.backendUrl = url ? `${url}:${port}` : 'http://127.0.0.1:5001';
   }

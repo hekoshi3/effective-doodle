@@ -8,7 +8,7 @@ import { Model } from "@/entities/AImodel";
 import { useAuth } from "@/entities/user";
 import { CommentList, Comment } from "@/entities/comment";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://127.0.0.1:8000/api";
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "/api";
 
 export function ModelDetailPage() {
     const params = useParams();

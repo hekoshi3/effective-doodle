@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/entities/user";
 import { Notif, NotificationList } from "@/entities/notification";
 
-const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "http://127.0.0.1:8000/api";
+const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "/api";
 
 export const NotificationBell = () => {
     const auth = useAuth();

@@ -1,7 +1,7 @@
 import { useAuth } from "@/entities/user";
 
 const API_HOST =
-  process.env.NEXT_PUBLIC_BACKEND_API || "http://127.0.0.1:8000/api";
+  process.env.NEXT_PUBLIC_BACKEND_API || "/api";
 
 export function useUploadToDraft() {
   const auth = useAuth();
