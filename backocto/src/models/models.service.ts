@@ -118,8 +118,16 @@ export class ModelsService {
   }
 
   async findAll(query: BaseQueryDto, currentUserId?: number) {
-    const { ordering, author, tag, created_after, feed, model_type, search } =
-      query;
+    const {
+      ordering,
+      author,
+      tag,
+      created_after,
+      feed,
+      model_type,
+      search,
+      min_likes,
+    } = query;
 
     const where: any = {
       AND: [
@@ -138,6 +146,14 @@ export class ModelsService {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
         ],
+      });
+    }
+
+    if (min_likes) {
+      where.AND.push({
+        likesCount: {
+          gte: Number(min_likes),
+        },
       });
     }
 

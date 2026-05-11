@@ -100,7 +100,8 @@ export class ImagesService {
   }
 
   async findAll(query: BaseQueryDto, currentUserId?: number) {
-    const { ordering, author, tag, created_after, feed, search } = query;
+    const { ordering, author, tag, created_after, feed, search, min_likes } =
+      query;
 
     const where: any = {
       AND: [
@@ -119,6 +120,14 @@ export class ImagesService {
             tags: { some: { name: { contains: search, mode: 'insensitive' } } },
           },
         ],
+      });
+    }
+
+    if (min_likes) {
+      where.AND.push({
+        likesCount: {
+          gte: Number(min_likes),
+        },
       });
     }
 
