@@ -11,22 +11,21 @@ export function SettingsProfile() {
     const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (url: string, options?: RequestInit) => Promise<Response>;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [selectedAvatarImage, setselectedAvatarImage] = useState<File | null>(null);
+    const [selectedAvatarImage, setSelectedAvatarImage] = useState<File | null>(null);
     const [selectedBannerImage, setSelectedBannerImage] = useState<File | null>(null);
     const [, setUserBioText] = useState<string>("");
 
-    const avatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            setselectedAvatarImage(files[0]);
-        }
-    };
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, callback: (file: File) => void) => {
+        const file = e.target.files?.[0];
+        if (!file) return
 
-    const bannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            setSelectedBannerImage(files[0]);
+        if (!file.type.startsWith('image/')) {
+            alert('Пожалуйста, выберите файл изображения (PNG, JPG, WEBP)');
+            e.target.value = '';
+            return;
         }
+        callback(file);
+
     };
 
     const bioChange = () => {
@@ -37,7 +36,7 @@ export function SettingsProfile() {
     };
 
     const removeSelectedAvatarImage = () => {
-        setselectedAvatarImage(null);
+        setSelectedAvatarImage(null);
     };
     const removeSelectedBannerImage = () => {
         setSelectedBannerImage(null);
@@ -76,6 +75,9 @@ export function SettingsProfile() {
         } catch (e) {
             console.error("|| error:", e);
         } finally {
+            removeSelectedAvatarImage()
+            removeSelectedBannerImage()
+            setUserBioText('')
             setIsSubmitting(false);
         }
     };
@@ -90,13 +92,13 @@ export function SettingsProfile() {
                             <div><p className="text-xl">Avatar</p></div>
                             {selectedAvatarImage ?
                                 <button onClick={removeSelectedAvatarImage} className="btn">Remove {selectedAvatarImage.name}</button>
-                                : <input type="file" name="avatar" className="file-input text-xs bg-neutral-800" onChange={avatarChange} />}
+                                : <input type="file" name="avatar" className="file-input text-xs bg-neutral-800" onChange={(e) => handleImageChange(e, setSelectedAvatarImage)} accept="image/png, image/jpeg, image/webp" />}
                         </li>
                         <li className="list-row flex justify-between items-center min-w-xl">
                             <div><p className="text-xl">Banner</p></div>
                             {selectedBannerImage ?
                                 <button onClick={removeSelectedBannerImage} className="btn"> Remove {selectedBannerImage.name}</button>
-                                : <input type="file" name="banner" className="file-input text-xs bg-neutral-800" onChange={bannerChange} />}
+                                : <input type="file" name="banner" className="file-input text-xs bg-neutral-800" onChange={(e) => handleImageChange(e, setSelectedBannerImage)} accept="image/png, image/jpeg, image/webp" />}
                         </li>
                         <li className="list-row flex justify-between items-center min-w-xl">
                             <div><p className="text-xl">Name</p></div>
