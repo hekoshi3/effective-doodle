@@ -4,21 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { MediaService } from '../common/media/media.service';
 
 @Injectable()
 export class UsersService {
-  private readonly backendUrl = process.env.BACKEND_URL
-    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
-    : 'http://127.0.0.1:5001';
-  constructor(private prisma: PrismaService) {}
-
-  getFileUrl(path: string | null): string | null {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-
-    const cleanPath = path.replace(/\\/g, '/');
-    return `${this.backendUrl}/${cleanPath}`;
-  }
+  constructor(
+    private prisma: PrismaService,
+    private mediaService: MediaService,
+  ) {}
 
   async findAll(currentUserId?: number) {
     const users = await this.prisma.user.findMany({
@@ -39,8 +32,8 @@ export class UsersService {
       profile: {
         username: u.username,
         bio: u.profile?.bio || '',
-        avatar: this.getFileUrl(u.profile!.avatar),
-        banner: this.getFileUrl(u.profile!.banner),
+        avatar: this.mediaService.getAbsoluteUrl(u.profile!.avatar),
+        banner: this.mediaService.getAbsoluteUrl(u.profile!.banner),
       },
       followers_count: u._count.followers,
       is_following: currentUserId ? u.followers.length > 0 : false,
@@ -78,8 +71,8 @@ export class UsersService {
       profile: {
         username: user.username,
         bio: user.profile?.bio || '',
-        avatar: this.getFileUrl(user.profile!.avatar),
-        banner: this.getFileUrl(user.profile!.banner),
+        avatar: this.mediaService.getAbsoluteUrl(user.profile!.avatar),
+        banner: this.mediaService.getAbsoluteUrl(user.profile!.banner),
       },
       followers_count: user._count.followers,
       is_following: currentUserId ? user.followers.length > 0 : false,
@@ -136,8 +129,8 @@ export class UsersService {
       first_name: '',
       last_name: '',
       bio: user.profile?.bio || '',
-      avatar: this.getFileUrl(user.profile!.avatar),
-      banner: this.getFileUrl(user.profile!.banner),
+      avatar: this.mediaService.getAbsoluteUrl(user.profile!.avatar),
+      banner: this.mediaService.getAbsoluteUrl(user.profile!.banner),
       stats: {
         total_downloads: downloadsAgg._sum.downloadsCount || 0,
         total_likes: totalLikes,

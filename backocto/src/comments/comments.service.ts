@@ -6,24 +6,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CommentDto } from './dto/comments.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { MediaService } from '../common/media/media.service';
 
 @Injectable()
 export class CommentsService {
-  private readonly backendUrl = process.env.BACKEND_URL
-    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
-    : 'http://127.0.0.1:5001';
   constructor(
     private prisma: PrismaService,
     private notifService: NotificationsService,
+    private mediaService: MediaService,
   ) {}
-
-  getFileUrl(path: string | null): string | null {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-
-    const cleanPath = path.replace(/\\/g, '/');
-    return `${this.backendUrl}/${cleanPath}`;
-  }
 
   private mapComment(comm: any) {
     // !!! add delete or editing, ', currentUserId?: number'
@@ -39,7 +30,7 @@ export class CommentsService {
         profile: {
           username: comm.user.username,
           bio: comm.user?.bio ?? '',
-          avatar: this.getFileUrl(comm.user.profile.avatar),
+          avatar: this.mediaService.getAbsoluteUrl(comm.user.profile.avatar),
         },
       },
     };

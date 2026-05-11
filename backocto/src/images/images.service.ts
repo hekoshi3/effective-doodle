@@ -14,29 +14,20 @@ import { UpdateImageDto } from './dto/update-image.dto';
 import fs from 'fs/promises';
 import { BaseQueryDto } from '../common/dto/query-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { MediaService } from '../common/media/media.service';
 
 @Injectable()
 export class ImagesService {
-  private readonly backendUrl = process.env.BACKEND_URL
-    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
-    : 'http://127.0.0.1:5001';
   constructor(
     private prisma: PrismaService,
     private notifService: NotificationsService,
+    private mediaService: MediaService,
   ) {}
-
-  getFileUrl(path: string | null): string | null {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-
-    const cleanPath = path.replace(/\\/g, '/');
-    return `${this.backendUrl}/${cleanPath}`;
-  }
 
   private mapImage(img: any, currentUserId?: number) {
     return {
       ...img,
-      image: this.getFileUrl(img.image),
+      image: this.mediaService.getAbsoluteUrl(img.image),
       is_published: img.isPublished,
       likes_count: img.likes_count ?? img._count?.likes ?? 0,
       is_liked: currentUserId ? img.likes?.length > 0 : false,
@@ -47,7 +38,7 @@ export class ImagesService {
         profile: {
           username: img.author.username,
           bio: img.author?.profile.bio ?? '',
-          avatar: this.getFileUrl(img.author.profile.avatar),
+          avatar: this.mediaService.getAbsoluteUrl(img.author.profile.avatar),
         },
         followers_count: img.author._count?.followers || 0,
         is_following: false,

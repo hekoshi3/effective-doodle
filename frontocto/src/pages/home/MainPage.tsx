@@ -25,14 +25,14 @@ const getDateAfter = (range: string) => {
     return now.toISOString();
 };
 
-const Select = ({ value, onChange, options, placeholder, className = "" }: any) => (
+const Select = ({ value, onChange, options=[], placeholder, className = "" }: any) => (
     <select 
         value={value} 
         onChange={(e) => onChange(e.target.value)}
         className={`bg-neutral-800 text-sm text-neutral-400 p-2 rounded border border-neutral-700 outline-none focus:border-accent ${className}`}
     >
         <option value="">{placeholder}</option>
-        {options.map((opt: any) => (
+        {Array.isArray(options) && options.map((opt: any) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
     </select>

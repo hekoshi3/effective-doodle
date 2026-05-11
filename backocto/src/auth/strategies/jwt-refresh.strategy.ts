@@ -5,17 +5,22 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
   'jwt-refresh',
 ) {
-  constructor() {
+  constructor(private configService: ConfigService) {
+    const secret = configService.get<string>('RT_SECRET');
+    if (!secret) {
+      throw new Error('RT_SECRET is not defined in ENV');
+    }
     super({
       jwtFromRequest: (req: Request) => {
         return req?.body?.refresh || null;
       },
-      secretOrKey: 'RT_SECRET', // !!!
+      secretOrKey: secret,
       passReqToCallback: true,
     });
   }

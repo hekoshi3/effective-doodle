@@ -9,12 +9,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -66,7 +68,7 @@ export class AuthService {
     const payload = { sub: userId, username };
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: 'AT_SECRET',
+        secret: this.configService.get<string>('AT_SECRET'),
         expiresIn: '1d',
       }),
       this.jwtService.signAsync(payload, {

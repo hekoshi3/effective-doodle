@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationType } from '../generated/prisma';
+import { MediaService } from '../common/media/media.service';
 
 type NotificationWithActor = Prisma.NotificationGetPayload<{
   include: {
@@ -17,20 +18,10 @@ type NotificationWithActor = Prisma.NotificationGetPayload<{
 
 @Injectable()
 export class NotificationsService {
-  constructor(private prisma: PrismaService) {}
-
-  private readonly backendUrl = process.env.BACKEND_URL
-    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
-    : 'http://127.0.0.1:5001';
-
-  getFileUrl(path: string | null): string | null {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-
-    const cleanPath = path.replace(/\\/g, '/');
-    return `${this.backendUrl}/${cleanPath}`;
-  }
-
+  constructor(
+    private prisma: PrismaService,
+    private mediaService: MediaService,
+  ) {}
   private mapNotifications(n: NotificationWithActor) {
     return {
       id: n.id,
@@ -45,7 +36,9 @@ export class NotificationsService {
         username: n.actor.username,
         profile: {
           username: n.actor.username,
-          avatar: this.getFileUrl(n.actor.profile?.avatar ?? ''),
+          avatar: this.mediaService.getAbsoluteUrl(
+            n.actor.profile?.avatar ?? '',
+          ),
         },
       },
     };

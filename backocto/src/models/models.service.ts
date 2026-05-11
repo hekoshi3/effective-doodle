@@ -15,30 +15,23 @@ import fs from 'fs/promises';
 import { UpdateModelDto } from './dto/update-model.dto';
 import { BaseQueryDto } from '../common/dto/query-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { MediaService } from '../common/media/media.service';
 
 @Injectable()
 export class ModelsService {
-  private readonly backendUrl = process.env.BACKEND_URL
-    ? `${process.env.BACKEND_URL}:${process.env.BACKEND_PORT}`
-    : 'http://127.0.0.1:5001';
   constructor(
     private prisma: PrismaService,
     private notifService: NotificationsService,
+    private mediaService: MediaService,
   ) {}
-
-  getFileUrl(path: string | null): string | null {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-
-    const cleanPath = path.replace(/\\/g, '/');
-    return `${this.backendUrl}/${cleanPath}`;
-  }
 
   private mapModel(model: any, currentUserId?: number) {
     return {
       ...model,
-      file: this.getFileUrl(model.file),
-      featuredImage: this.getFileUrl(model.featuredImage?.image),
+      file: this.mediaService.getAbsoluteUrl(model.file),
+      featuredImage: this.mediaService.getAbsoluteUrl(
+        model.featuredImage?.image,
+      ),
       model_type: model.modelType,
       is_published: model.isPublished,
       likes_count: model.likesCount ?? model._count?.likes ?? 0,
@@ -46,14 +39,14 @@ export class ModelsService {
       downloads_count: model.downloadsCount,
       created_at: model.createdAt,
       featured_image_url: model.featuredImage
-        ? this.getFileUrl(model.featuredImage.image)
+        ? this.mediaService.getAbsoluteUrl(model.featuredImage.image)
         : null,
       author: {
         id: model.authorId,
         username: model.author.username,
         profile: {
           username: model.author.username,
-          avatar: this.getFileUrl(model.author.profile.avatar),
+          avatar: this.mediaService.getAbsoluteUrl(model.author.profile.avatar),
         },
         followers_count: model.author._count?.followers || 0,
         is_following: false,
@@ -311,6 +304,6 @@ export class ModelsService {
         downloadsCount: { increment: 1 },
       },
     });
-    return { url: this.getFileUrl(model.file), id: model.id };
+    return { url: this.mediaService.getAbsoluteUrl(model.file), id: model.id };
   }
 }

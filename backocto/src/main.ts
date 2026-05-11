@@ -24,7 +24,15 @@ async function bootstrap() {
   });
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
   await app.listen(process.env.BACKEND_PORT ?? 5001, '0.0.0.0');
 }
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

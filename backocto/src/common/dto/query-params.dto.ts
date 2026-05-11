@@ -9,4 +9,5 @@ export class BaseQueryDto {
   @IsOptional() @IsString() model_type?: string;
   @IsOptional() @IsString() download_count?: string;
   @IsOptional() @IsString() search?: string;
+  @IsOptional() @IsString() min_likes?: string;
 }
