@@ -1,0 +1,14 @@
+[Unit]
+Description=starting octo backend service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=!username!
+WorkingDirectory=/path/to/effective-doodle/backocto
+ExecStart=/usr/bin/npm run start
+
+[Install]
+WantedBy=multi-user.target
