@@ -6,6 +6,7 @@ import { useGetTags } from "@/entities/tag";
 import { useTags } from "@/entities/tag";
 import { useManageModel } from "@/features/upload";
 import { useCallback } from "react";
+import Link from "next/link";
 
 export function ModelEditPage() {
     const router = useRouter();
@@ -30,7 +31,7 @@ export function ModelEditPage() {
         handlePublish,
         isPublishing,
         isSaving,
-        isLoading,
+        isLoading,isAuthor,
         error,
         modelData,
         name,
@@ -42,7 +43,7 @@ export function ModelEditPage() {
         })
 
     if (isLoading) return <main className="flex min-h-screen items-center justify-center bg-neutral-900"><span className="loading loading-ring loading-xl text-accent"></span></main>;
-    if (error || !modelData) return <main className="flex min-h-screen items-center justify-center bg-neutral-900 text-red-400">{error || "Model not found"}</main>;
+    if (error || !modelData || !isAuthor) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Model not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
 
     return (
         <main className="bg-neutral-900 min-h-screen text-white font-sans">

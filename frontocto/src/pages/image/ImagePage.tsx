@@ -136,8 +136,7 @@ export function ImageDetailPage() {
     };
 
     if (isLoading) return <main className="flex w-screen items-center justify-center min-h-screen bg-neutral-900"><span className="loading loading-ring loading-xl text-white"></span></main>;
-    if (error || !image) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-red-400 text-xl">{error || "Image not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
-
+    if (error || !image || (!isAuthor && !image.is_published)) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Image not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
     return (
         <main className="bg-neutral-900 min-h-screen pb-20">
             <div className="container mx-auto px-4 py-8 max-w-7xl">

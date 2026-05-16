@@ -160,7 +160,7 @@ export function ModelDetailPage() {
     };
 
     if (isLoading) return <main className="flex w-screen items-center justify-center min-h-screen bg-neutral-900"><div className="loading loading-ring loading-xl text-white"></div></main>;
-    if (error || !model) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-red-400 text-xl">{error || "Model not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
+    if (error || !model || (!isAuthor && !model.is_published)) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Model not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
 
     return (
         <main className="bg-neutral-900 min-h-screen pb-20">

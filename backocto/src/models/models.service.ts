@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -248,6 +247,9 @@ export class ModelsService {
     });
     if (!model) throw new NotFoundException('Model not found');
 
+    if (!model.isPublished && model.authorId !== currentUserId)
+      throw new NotFoundException('Image not found');
+
     return this.mapModel(model, currentUserId);
   }
 
@@ -257,7 +259,7 @@ export class ModelsService {
     });
     if (!existing) throw new NotFoundException();
     if (existing.authorId !== userId)
-      throw new ForbiddenException('User have no access to this object');
+      throw new NotFoundException('Object not found');
 
     const updated = await this.prisma.aiModel.update({
       where: { id },
@@ -300,8 +302,8 @@ export class ModelsService {
 
   async remove(id: number, userId) {
     const model = await this.findOne(id);
-    if (model.authorId !== userId)
-      throw new ForbiddenException('User have no access to this object');
+    if (model.authorId !== userId || model)
+      throw new NotFoundException('Object not found');
 
     try {
       await fs.access(model.file);

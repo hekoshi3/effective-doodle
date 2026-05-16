@@ -30,6 +30,7 @@ export function useManageModel(
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isAuthor, setIsAuthor] = useState(false);
 
   useEffect(() => {
     if (!id || auth.isLoading) return;
@@ -47,7 +48,8 @@ export function useManageModel(
         setModelData(data);
         setName(data.name || "");
         setDescription(data.description || "");
-
+        setIsAuthor((auth.user && data && auth.user.username === data.author.username) || false);
+        
         if (onSuccess) onSuccess(data);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,18 +61,7 @@ export function useManageModel(
     };
 
     loadModel();
-  }, [
-    id,
-    auth.isLoading,
-    makeAuthenticatedRequest,
-    setIsLoading,
-    setModelData,
-    setName,
-    setDescription,
-    setError,
-    onSuccess,
-    auth.token,
-  ]);
+  }, [id, auth.isLoading, makeAuthenticatedRequest, setIsLoading, setModelData, setName, setDescription, setError, onSuccess, auth.token, auth.user]);
 
   const handleSaveDraft = async () => {
     if (!auth.token || !modelData) return;
@@ -139,11 +130,12 @@ export function useManageModel(
     isPublishing,
     isSaving,
     isLoading,
+    isAuthor,
     error,
     modelData,
     name,
     description,
     setName,
-    setDescription,
+    setDescription
   };
 }

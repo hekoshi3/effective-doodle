@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { GalleryImage } from "@/entities/AIimage";
 import { useAuth } from "@/entities/user";
+import Link from "next/link";
 
 const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "/api";
 
@@ -14,7 +15,7 @@ export function ImageEditPage() {
     const id = params?.id
     const router = useRouter();
     const auth = useAuth();
-    
+
     const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (
         url: string,
         options?: RequestInit
@@ -32,6 +33,7 @@ export function ImageEditPage() {
 
     const [isSaving, setIsSaving] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [isAuthor, setIsAuthor] = useState(false);
 
     useEffect(() => {
         if (!id || auth.isLoading) return;
@@ -48,7 +50,7 @@ export function ImageEditPage() {
                 const data: GalleryImage = await res.json();
                 setImage(data);
                 setDescription(data.description || "");
-
+                setIsAuthor((auth.user && data && auth.user.username === data.author.username) || false);
                 if (Array.isArray(data.tags)) {
                     setTags(data.tags.map((t: any) => typeof t === "string" ? t : t.name));
                 }
@@ -60,7 +62,7 @@ export function ImageEditPage() {
         };
 
         loadImage();
-    }, [id, auth.token, auth.isLoading, makeAuthenticatedRequest]);
+    }, [id, auth.token, auth.isLoading, makeAuthenticatedRequest, auth.user]);
 
     useEffect(() => {
         fetch(`${API_HOST}/tags/`)
@@ -70,19 +72,19 @@ export function ImageEditPage() {
                     setAllTags(data.map((t: any) => typeof t === "string" ? t : t.name));
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     }, []);
 
     const suggestions =
         tagInput.trim() === ""
             ? []
             : allTags
-                  .filter(
-                      (t) =>
-                          t.toLowerCase().includes(tagInput.toLowerCase()) &&
-                          !tags.includes(t)
-                  )
-                  .slice(0, 8);
+                .filter(
+                    (t) =>
+                        t.toLowerCase().includes(tagInput.toLowerCase()) &&
+                        !tags.includes(t)
+                )
+                .slice(0, 8);
 
     const addTag = (value: string) => {
         const clean = value.replace(/,/g, "").trim();
@@ -131,7 +133,7 @@ export function ImageEditPage() {
     };
 
     if (isLoading) return <main className="flex min-h-screen items-center justify-center bg-neutral-900"><span className="loading loading-ring loading-xl text-accent"></span></main>;
-    if (error || !image) return <main className="flex min-h-screen items-center justify-center bg-neutral-900 text-red-400">{error || "Image not found"}</main>;
+    if (error || !image || !isAuthor) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Image not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
 
     return (
         <main className="bg-neutral-900 min-h-screen text-white font-sans">
@@ -143,21 +145,21 @@ export function ImageEditPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <div className="flex flex-col gap-4">
                         <div className="relative aspect-square bg-neutral-800 rounded-2xl overflow-hidden border border-neutral-700 shadow-2xl">
-                            <Image 
-                                src={image.image} 
-                                alt="Editable item" 
-                                fill 
-                                className="object-contain" 
-                                priority 
+                            <Image
+                                src={image.image}
+                                alt="Editable item"
+                                fill
+                                className="object-contain"
+                                priority
                             />
                         </div>
                         {image.author && (
                             <div className="flex items-center gap-3 p-4 bg-neutral-800 rounded-xl border border-neutral-700">
                                 <div className="relative w-10 h-10 rounded-full overflow-hidden border border-neutral-600">
-                                    <Image 
-                                        src={image.author.profile?.avatar || "/img/nacho.png"} 
-                                        alt={image.author.username} 
-                                        fill 
+                                    <Image
+                                        src={image.author.profile?.avatar || "/img/nacho.png"}
+                                        alt={image.author.username}
+                                        fill
                                         className="object-cover"
                                     />
                                 </div>
@@ -214,13 +216,13 @@ export function ImageEditPage() {
                                 <div className="flex flex-wrap gap-2 pt-1">
                                     {tags.length === 0 && <span className="text-sm text-neutral-600 italic">No tags added yet</span>}
                                     {tags.map((t) => (
-                                        <span 
-                                            key={t} 
+                                        <span
+                                            key={t}
                                             className="flex items-center gap-1.5 bg-accent/10 text-accent border border-accent/20 px-3 py-1.5 rounded-full text-sm font-medium transition-all hover:bg-accent/20"
                                         >
                                             #{t}
-                                            <button 
-                                                type="button" 
+                                            <button
+                                                type="button"
                                                 onClick={() => removeTag(t)}
                                                 className="hover:text-white ml-1 font-bold text-lg leading-none"
                                             >

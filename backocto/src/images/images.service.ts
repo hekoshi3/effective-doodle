@@ -3,11 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { extractAIMetadata } from '../common/utils/ai-metadata.parser';
 import { UpdateImageDto } from './dto/update-image.dto';
@@ -216,6 +212,10 @@ export class ImagesService {
       },
     });
     if (!img) throw new NotFoundException('Image not found');
+
+    if (!img.isPublished && img.authorId !== currentUserId)
+      throw new NotFoundException('Image not found');
+
     return this.mapImage(img, currentUserId);
   }
 
@@ -223,9 +223,8 @@ export class ImagesService {
     const existing = await this.prisma.generatedImage.findUnique({
       where: { id },
     });
-    if (!existing) throw new NotFoundException();
-    if (existing.authorId !== userId)
-      throw new ForbiddenException('User have no access to this object');
+    if (!existing || existing.authorId !== userId)
+      throw new NotFoundException('Image not found');
 
     const { tags, is_published, linked_model, ...data } = dto;
 
@@ -267,10 +266,10 @@ export class ImagesService {
     return this.mapImage(updated);
   }
 
-  async remove(id: number, userId) {
+  async remove(id: number, userId: number) {
     const img = await this.findOne(id);
-    if (img.authorId !== userId)
-      throw new ForbiddenException('User has no access to this object');
+    if (img.authorId !== userId || img)
+      throw new NotFoundException('Object not found');
     try {
       await fs.access(img.file);
       await fs.unlink(img.file);
