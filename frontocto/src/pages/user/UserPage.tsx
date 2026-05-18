@@ -55,14 +55,14 @@ export function UserPage() {
     }
 
     return (
-        <main className="flex w-screen min-h-screen bg-neutral-900 text-neutral-200">
+        <main className="flex w-screen min-h-screen bg-neutral-900 text-neutral-200 overflow-hidden">
             <div className="flex w-full flex-col"> {/* bg-[url(/img/nachosmile.jpg)] */}
-                <div className="h-80 border-b border-neutral-950 relative">
-                    <div className="justify-center items-center">
+                <div className="border-b border-neutral-950 relative">
+                    <div className="flex justify-center items-center">
                         {userProfile.profile.banner ? <Image
                             src={userProfile.profile.banner}
                             alt="Profile banner"
-                            className="max-h-79 object-cover"
+                            className="max-h-80 object-cover w-full"
                             height={512}
                             width={1920}
                             loading={"lazy"}>
@@ -78,96 +78,96 @@ export function UserPage() {
                     </div>
                     <div className="absolute inset-0 bg-linear-to-b from-transparent to-neutral-900"></div>
                 </div>
-
-                <div className="flex flex-col lg:flex-row">
-                    <div className="flex-1 overflow-y-auto pt-4 pl-4 pr-4 lg:pr-8">
-                        <div className="flex gap-4 mb-6 border-b border-neutral-800">
-                            {["images", "models", "analytics"].map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab as SetStateAction<"images" | "models" | "analytics">)}
-                                    className={`pb-2 px-4 font-semibold transition-colors capitalize ${activeTab === tab ? "text-white border-b-2 border-blue-500" : "text-neutral-400 hover:text-white"
-                                        }`}
-                                >
-                                    {tab} {tab === "images" && `(${gallery.length})`} {tab === "models" && `(${models.length})`}
-                                </button>
-                            ))}
-                        </div>
-
-                        {activeTab === "images" && (
-                            gallery.length > 0 ? (
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                                    {gallery.map((img, index) => <AuthImageCard key={img.id ?? index} image={img} index={index} />)}
-                                </div>
-                            ) : <div className="flex items-center justify-center h-64 text-neutral-400">No images yet</div>
-                        )}
-
-                        {activeTab === "models" && (
-                            models.length > 0 ? (
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                                    {models.map((model, index) => <AuthModelCard key={model.id ?? index} model={model} index={index} />)}
-                                </div>
-                            ) : <div className="flex items-center justify-center h-64 text-neutral-400">No models yet</div>
-                        )}
-
-                        {activeTab === "analytics" && (
-                            <div className="space-y-8 pb-10">
-                                {analytics ? (
-                                    <>
-                                        <ActivityGraph data={analytics.activity_graph} />
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="bg-neutral-800/30 p-4 rounded-xl border border-neutral-800">
-                                                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                                                    Популярные модели
-                                                </h3>
-                                                <div className="space-y-3">
-                                                    {analytics.top_models.map(m => (
-                                                        <div key={m.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
-                                                            <Link href={"/model/" + m.id} className="text-sm truncate max-w-37.5">{m.name}</Link>
-                                                            <div className="flex gap-3 text-xs">
-                                                                <span className="text-blue-400">⬇ {m.downloads_count}</span>
-                                                                <span className="text-pink-400">❤ {m.likes_count}</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <div className="bg-neutral-800/30 p-4 rounded-xl border border-neutral-800">
-                                                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                                                    Топ изображений
-                                                </h3>
-                                                <div className="space-y-3">
-                                                    {analytics.top_images.map(img => (
-                                                        <div key={img.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
-                                                            <Link href={"/image/" + img.id} className="text-sm text-neutral-500">ID: {img.id}</Link>
-                                                            <span className="text-pink-400 text-xs font-bold">❤ {img.likes_count} лайков</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-800 rounded-3xl text-neutral-500">
-                                        <p>Аналитика для этого пользователя пока недоступна</p>
-                                    </div>
-                                )}
+                <div className="">
+                    <div className="flex flex-col lg:flex-row">
+                         <UserSidebar
+                            userProfile={userProfile}
+                            displayCount={displayCount}
+                            displayFollow={displayFollow}
+                            toggleFollow={toggleFollow}
+                            auth={auth}
+                            isOwnProfile={isOwnProfile}
+                            isUpdatingFollow={isUpdatingFollow}
+                            currentUserProfile={currentUserProfile}>
+                        </UserSidebar>
+                        <div className="flex-1 overflow-y-auto pt-4 pl-4 pr-4 lg:pr-8">
+                            <div className="flex gap-4 mb-6 border-b border-neutral-800">
+                                {["images", "models", "analytics"].map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab as SetStateAction<"images" | "models" | "analytics">)}
+                                        className={`pb-2 px-4 font-semibold transition-colors capitalize ${activeTab === tab ? "text-white border-b-2 border-blue-500" : "text-neutral-400 hover:text-white"
+                                            }`}
+                                    >
+                                        {tab} {tab === "images" && `(${gallery.length})`} {tab === "models" && `(${models.length})`}
+                                    </button>
+                                ))}
                             </div>
-                        )}
-                    </div>
 
-                    <UserSidebar
-                        userProfile={userProfile}
-                        displayCount={displayCount}
-                        displayFollow={displayFollow}
-                        toggleFollow={toggleFollow}
-                        auth={auth}
-                        isOwnProfile={isOwnProfile}
-                        isUpdatingFollow={isUpdatingFollow}
-                        currentUserProfile={currentUserProfile}>
-                    </UserSidebar>
+                            {activeTab === "images" && (
+                                gallery.length > 0 ? (
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                                        {gallery.map((img, index) => <AuthImageCard key={img.id ?? index} image={img} index={index} />)}
+                                    </div>
+                                ) : <div className="flex items-center justify-center h-64 text-neutral-400">No images yet</div>
+                            )}
+
+                            {activeTab === "models" && (
+                                models.length > 0 ? (
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                                        {models.map((model, index) => <AuthModelCard key={model.id ?? index} model={model} index={index} />)}
+                                    </div>
+                                ) : <div className="flex items-center justify-center h-64 text-neutral-400">No models yet</div>
+                            )}
+
+                            {activeTab === "analytics" && (
+                                <div className="space-y-8 pb-10">
+                                    {analytics ? (
+                                        <>
+                                            <ActivityGraph data={analytics.activity_graph} />
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="bg-neutral-800/30 p-4 rounded-xl border border-neutral-800">
+                                                    <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                                                        Популярные модели
+                                                    </h3>
+                                                    <div className="space-y-3">
+                                                        {analytics.top_models.map(m => (
+                                                            <div key={m.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
+                                                                <Link href={"/model/" + m.id} className="text-sm truncate max-w-37.5">{m.name}</Link>
+                                                                <div className="flex gap-3 text-xs">
+                                                                    <span className="text-blue-400">⬇ {m.downloads_count}</span>
+                                                                    <span className="text-pink-400">❤ {m.likes_count}</span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-neutral-800/30 p-4 rounded-xl border border-neutral-800">
+                                                    <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                                                        Топ изображений
+                                                    </h3>
+                                                    <div className="space-y-3">
+                                                        {analytics.top_images.map(img => (
+                                                            <div key={img.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
+                                                                <Link href={"/image/" + img.id} className="text-sm text-neutral-500">ID: {img.id}</Link>
+                                                                <span className="text-pink-400 text-xs font-bold">❤ {img.likes_count} лайков</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-800 rounded-3xl text-neutral-500">
+                                            <p>Аналитика для этого пользователя пока недоступна</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
