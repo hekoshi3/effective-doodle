@@ -33,6 +33,7 @@ export function AuthPage() {
               required
               className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your username"
+              autoComplete="on"
             />
           </div>
 
@@ -47,6 +48,7 @@ export function AuthPage() {
               required
               className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
+              autoComplete="on"
             />
           </div>
 

@@ -69,9 +69,10 @@ export const NotificationBell = () => {
     if (!auth.token) return null;
 
     return (
-        <details className="dropdown dropdown-end">
+        <details className="dropdown lg:dropdown-center z-10">
             <summary className="cursor-pointer bg-transparent list-none">
-                <div className="indicator">
+                <p className="lg:hidden">Уведомления</p>
+                <div className="indicator hidden lg:flex">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
@@ -81,7 +82,7 @@ export const NotificationBell = () => {
                 </div>
             </summary>
 
-            <ul className="dropdown-content z-100 mt-3 p-2 shadow-2xl bg-neutral-800 border border-neutral-700 rounded-xl w-80 sm:w-96 flex flex-col gap-1 max-h-125 overflow-y-auto overflow-x-hidden">
+            <ul className="max-w-screen -translate-x-6 lg:translate-x-0 dropdown-content z-100 mt-3 p-2 shadow-2xl bg-neutral-800 border border-neutral-700 rounded-xl w-80 sm:w-96 flex flex-col gap-1 max-h-125 overflow-y-auto overflow-x-hidden">
                 <li className="p-3 border-b border-neutral-700 flex justify-between items-center sticky top-0 bg-neutral-800 z-10">
                     <span className="font-bold text-white">Notifications</span>
                     {unreadCount > 0 && (

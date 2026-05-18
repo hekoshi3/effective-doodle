@@ -97,7 +97,7 @@ export function ImageUploadPage() {
                                         </svg>
                                         <p className="text-sm text-neutral-400">Click to upload or drag and drop</p>
                                     </div>
-                                    <input type="file" className="hidden" onChange={imageChange} accept="image/*" />
+                                    <input type="file" className="hidden" onChange={imageChange} accept="image/*" autoComplete="off"/>
                                 </label>
                             ) : (
                                 <div className="relative w-full h-full">

@@ -12,7 +12,7 @@ export function GeneratePage() {
 
   if (isLoading) {
     return (
-      <LoadingScreen/>
+      <LoadingScreen />
     );
   }
 
@@ -47,6 +47,7 @@ export function GeneratePage() {
                     placeholder="Width"
                     defaultValue={832}
                     onChange={(e) => actions.setImgWidth(parseInt(e.target.value))}
+                    autoComplete="off"
                   />
                   <p>x</p>
                   <input
@@ -57,6 +58,7 @@ export function GeneratePage() {
                     placeholder="Height"
                     defaultValue={1216}
                     onChange={(e) => actions.setImgHeight(parseInt(e.target.value))}
+                    autoComplete="off"
                   />
                 </div>
               </div>
@@ -70,6 +72,7 @@ export function GeneratePage() {
                   placeholder="Steps"
                   defaultValue={20}
                   onChange={(e) => actions.setGenSteps(parseInt(e.target.value))}
+                  autoComplete="off"
                 />
                 <p>CFG</p>
                 <input
@@ -83,6 +86,7 @@ export function GeneratePage() {
                   max={10}
                   step="any"
                   onChange={(e) => actions.setGenCfg(parseInt(e.target.value))}
+                  autoComplete="off"
                 />
               </div>
             </div>

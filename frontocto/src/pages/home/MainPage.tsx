@@ -25,9 +25,9 @@ const getDateAfter = (range: string) => {
     return now.toISOString();
 };
 
-const Select = ({ value, onChange, options=[], placeholder, className = "" }: any) => (
-    <select 
-        value={value} 
+const Select = ({ value, onChange, options = [], placeholder, className = "" }: any) => (
+    <select
+        value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`bg-neutral-800 text-sm text-neutral-400 p-2 rounded border border-neutral-700 outline-none focus:border-accent ${className}`}
     >
@@ -59,10 +59,10 @@ export function MainPage() {
 
     const [gallery, setGallery] = useState<GalleryImage[]>([]);
     const [models, setModels] = useState<Model[]>([]);
-    
+
     const [feedMode, setFeedMode] = useState<"global" | "following">("global");
 
-    const [modelTypes, setModelTypes] = useState<{value: string, label: string}[]>([]);
+    const [modelTypes, setModelTypes] = useState<{ value: string, label: string }[]>([]);
     const [users, setUsers] = useState<User[]>([]);
     const [availableModels, setAvailableModels] = useState<Model[]>([]);
 
@@ -95,7 +95,7 @@ export function MainPage() {
             if (imgTag) params.append("tag", imgTag);
             if (imgMinLikes) params.append("min_likes", imgMinLikes);
             if (imgLinkedModel) params.append("linked_model", imgLinkedModel);
-            
+
             const dateAfter = getDateAfter(imgDateRange);
             if (dateAfter) params.append("created_after", dateAfter);
 
@@ -118,7 +118,7 @@ export function MainPage() {
             if (modelType) params.append("model_type", modelType);
             if (modelMinLikes) params.append("min_likes", modelMinLikes);
             if (modelMinDownloads) params.append("min_downloads", modelMinDownloads);
-            
+
             const dateAfter = getDateAfter(modelDateRange);
             if (dateAfter) params.append("created_after", dateAfter);
 
@@ -136,13 +136,13 @@ export function MainPage() {
         <main className="bg-neutral-900 min-h-screen p-4 sm:p-8 text-white">
             <div className="absolute right-0 left-0 top-15 flex justify-center mb-10">
                 <div className="inline-flex bg-neutral-800 p-1 rounded-xl border border-neutral-700 shadow-lg">
-                    <button 
+                    <button
                         onClick={() => setFeedMode("global")}
                         className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${feedMode === "global" ? 'bg-accent text-black' : 'text-neutral-400 hover:text-white'}`}
                     >
                         Global
                     </button>
-                    <button 
+                    <button
                         onClick={() => {
                             if (!auth.token) {
                                 alert("Please login to see followed users feed");
@@ -164,36 +164,37 @@ export function MainPage() {
                     </h1>
                     <div className="flex flex-wrap gap-2 items-center bg-neutral-800/30 p-3 rounded-lg border border-neutral-800">
                         {feedMode === "global" && (
-                            <Select 
-                                value={imgAuthor} 
-                                onChange={setImgAuthor} 
-                                placeholder="User" 
-                                options={users.map(u => ({ value: u.id.toString(), label: u.username }))} 
+                            <Select
+                                value={imgAuthor}
+                                onChange={setImgAuthor}
+                                placeholder="User"
+                                options={users.map(u => ({ value: u.id.toString(), label: u.username }))}
                             />
                         )}
-                        <Select 
-                            value={imgLinkedModel} 
-                            onChange={setImgLinkedModel} 
-                            placeholder="Base Model" 
-                            options={availableModels.map(m => ({ value: m.id.toString(), label: m.name }))} 
+                        <Select
+                            value={imgLinkedModel}
+                            onChange={setImgLinkedModel}
+                            placeholder="Base Model"
+                            options={availableModels.map(m => ({ value: m.id.toString(), label: m.name }))}
                         />
-                        <input 
-                            type="text" 
-                            value={imgTag} 
-                            onChange={(e) => setImgTag(e.target.value)} 
-                            placeholder="Exact Tag..." 
+                        <input
+                            type="text"
+                            value={imgTag}
+                            onChange={(e) => setImgTag(e.target.value)}
+                            placeholder="Exact Tag..."
                             className="bg-neutral-800 text-sm p-2 rounded border border-neutral-700 w-32 outline-none focus:border-accent"
+                            autoComplete="off"
                         />
                         <Select value={imgMinLikes} onChange={setImgMinLikes} placeholder="Min Likes" options={LIKE_OPTIONS} />
                         <Select value={imgDateRange} onChange={setImgDateRange} placeholder="Time Range" options={DATE_OPTIONS} />
-                        <Select 
-                            value={imgSort} 
-                            onChange={setImgSort} 
-                            placeholder="Sort" 
+                        <Select
+                            value={imgSort}
+                            onChange={setImgSort}
+                            placeholder="Sort"
                             options={[
                                 { value: "-created_at", label: "Newest" },
                                 { value: "-likes_count", label: "Popular" },
-                            ]} 
+                            ]}
                         />
                     </div>
                 </div>
@@ -214,33 +215,34 @@ export function MainPage() {
                     <div className="flex flex-wrap gap-2 items-center bg-neutral-800/30 p-3 rounded-lg border border-neutral-800">
                         <Select value={modelType} onChange={setModelType} placeholder="Type" options={modelTypes} />
                         {feedMode === "global" && (
-                            <Select 
-                                value={modelAuthor} 
-                                onChange={setModelAuthor} 
-                                placeholder="User" 
-                                options={users.map(u => ({ value: u.id.toString(), label: u.username }))} 
+                            <Select
+                                value={modelAuthor}
+                                onChange={setModelAuthor}
+                                placeholder="User"
+                                options={users.map(u => ({ value: u.id.toString(), label: u.username }))}
                             />
                         )}
-                        <input 
-                            type="text" 
-                            value={modelTag} 
-                            onChange={(e) => setModelTag(e.target.value)} 
-                            placeholder="Exact Tag..." 
+                        <input
+                            type="text"
+                            value={modelTag}
+                            onChange={(e) => setModelTag(e.target.value)}
+                            placeholder="Exact Tag..."
                             className="bg-neutral-800 text-sm p-2 rounded border border-neutral-700 w-32 outline-none focus:border-accent"
+                            autoComplete="off"
                         />
                         <Select value={modelMinLikes} onChange={setModelMinLikes} placeholder="Min Likes" options={LIKE_OPTIONS} />
                         <Select value={modelMinDownloads} onChange={setModelMinDownloads} placeholder="Min DL" options={[{ value: "50", label: "50+ DL" }, { value: "200", label: "200+ DL" }, { value: "1000", label: "1000+ DL" }]} />
                         <Select value={modelDateRange} onChange={setModelDateRange} placeholder="Time Range" options={DATE_OPTIONS} />
-                        <Select 
-                            value={modelSort} 
-                            onChange={setModelSort} 
-                            placeholder="Sort" 
+                        <Select
+                            value={modelSort}
+                            onChange={setModelSort}
+                            placeholder="Sort"
                             options={[
                                 { value: "-created_at", label: "Недавние" },
                                 { value: "-downloads_count", label: "По загрузкам" },
                                 { value: "-likes_count", label: "По лайкам" },
                                 { value: "-rating", label: "По рейтингу" },
-                            ]} 
+                            ]}
                         />
                     </div>
                 </div>

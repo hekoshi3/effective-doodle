@@ -127,6 +127,7 @@ export function ModelUploadPage() {
                                 placeholder="e.g. My Awesome LoRA"
                                 className="input input-bordered w-full bg-neutral-700 border-neutral-600 focus:border-accent"
                                 required
+                                autoComplete="off"
                             />
                         </div>
 
@@ -151,6 +152,7 @@ export function ModelUploadPage() {
                                 className="file-input file-input-bordered file-input-accent w-full bg-neutral-700"
                                 accept=".safetensors,.ckpt,.pt,.zip,.bin"
                                 required
+                                autoComplete="off"
                             />
                         </div>
 
@@ -160,7 +162,7 @@ export function ModelUploadPage() {
                                 {!previewImage ? (
                                     <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
                                         <span className="text-sm text-neutral-500">Upload cover image</span>
-                                        <input type="file" className="hidden" onChange={(e) => setPreviewImage(e.target.files?.[0] || null)} accept="image/*" />
+                                        <input type="file" className="hidden" onChange={(e) => setPreviewImage(e.target.files?.[0] || null)} accept="image/*" autoComplete="off"/>
                                     </label>
                                 ) : (
                                     <div className="relative w-full h-full">

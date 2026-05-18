@@ -196,6 +196,7 @@ export function ImageEditPage() {
                                     }}
                                     placeholder="Type tag and press Enter..."
                                     className="w-full bg-neutral-800 text-white rounded-xl p-3 border border-neutral-700 focus:border-accent outline-none transition-all shadow-inner"
+                                    autoComplete="off"
                                 />
 
                                 {suggestions.length > 0 && (

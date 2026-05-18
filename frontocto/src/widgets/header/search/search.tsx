@@ -69,7 +69,7 @@ export const NavbarSearch = () => {
     };
 
     return (
-        <div className="relative w-full max-w-md" ref={searchRef}>
+        <div className="relative w-full max-w-md pl-5 pr-10" ref={searchRef}>
             <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                     type="text"
@@ -78,6 +78,10 @@ export const NavbarSearch = () => {
                     onFocus={() => query.length >= 2 && setIsOpen(true)}
                     placeholder="Search images or models..."
                     className="w-full bg-neutral-800 border border-neutral-700 text-white text-sm rounded-full py-2 px-10 focus:outline-none focus:border-accent transition-all"
+                    data-dashlane-ignore="true"
+                    data-bitwarden-no-autofill="true"
+                    data-lpignore="true"
+                    autoComplete="off"
                 />
                 <div className="absolute left-3 top-2.5 text-neutral-500">
                     {isLoading ? (
@@ -92,15 +96,15 @@ export const NavbarSearch = () => {
 
             {isOpen && (results.images.length > 0 || results.models.length > 0) && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden z-1000">
-                    
+
                     {results.models.length > 0 && (
                         <div className="p-2 border-b border-neutral-700">
                             <span className="text-[10px] uppercase font-bold text-neutral-500 px-2">Models</span>
                             {results.models.map(model => (
-                                <Link 
-                                    key={`m-${model.id}`} 
+                                <Link
+                                    key={`m-${model.id}`}
                                     href={`/model/${model.id}`}
-                                    onClick={() => {setIsOpen(false); setQuery("")}}
+                                    onClick={() => { setIsOpen(false); setQuery("") }}
                                     className="flex items-center gap-3 p-2 hover:bg-neutral-700 rounded-lg transition-colors group"
                                 >
                                     <div className="relative w-10 h-10 shrink-0 bg-neutral-900 rounded overflow-hidden">
@@ -120,10 +124,10 @@ export const NavbarSearch = () => {
                             <span className="text-[10px] uppercase font-bold text-neutral-500 px-2">Images</span>
                             <div className="grid grid-cols-2 gap-2 p-2">
                                 {results.images.map(img => (
-                                    <Link 
-                                        key={`i-${img.id}`} 
+                                    <Link
+                                        key={`i-${img.id}`}
                                         href={`/image/${img.id}`}
-                                        onClick={() => {setIsOpen(false); setQuery("")}}
+                                        onClick={() => { setIsOpen(false); setQuery("") }}
                                         className="relative aspect-square rounded overflow-hidden hover:ring-2 ring-accent transition-all"
                                     >
                                         <Image src={img.image} alt="" fill className="object-cover" />
