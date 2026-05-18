@@ -4,11 +4,11 @@ export interface User {
   username: string;
   first_name: string;
   last_name: string;
-  bio: string;
   avatar: string;
   profile: {
     // !!!
     id: number;
+    bio: string;
     username: string;
     profile: {
       avatar: string | null;
@@ -18,7 +18,7 @@ export interface User {
     is_following: boolean;
     banner: string;
   };
-  
+
   stats: {
     total_downloads: number;
     total_likes: number;
@@ -37,19 +37,19 @@ export interface Analytics {
       name: string;
       downloads_count: number;
       likes_count: number;
-    }
+    },
   ];
   top_images: [
     {
       id: number;
       likes_count: number;
       created_at: Date;
-    }
+    },
   ];
   activity_graph: [
     {
       date: string;
       count: number;
-    }
+    },
   ];
 }

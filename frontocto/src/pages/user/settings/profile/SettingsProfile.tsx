@@ -106,7 +106,7 @@ export function SettingsProfile() {
                         </li>
                         <li className="list-row flex justify-between items-center min-w-xl">
                             <div><p className="text-xl">Bio</p></div>
-                            <input type="text" name="bio" className="input bg-neutral-800" onChange={bioChange} />
+                            <textarea onChange={bioChange} maxLength={500} name="bio" className="input bg-neutral-800 h-20 p-1" placeholder=""></textarea>
                         </li>
                     </ul>
 

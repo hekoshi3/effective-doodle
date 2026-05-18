@@ -3,17 +3,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const UserSidebar = (
-    {userProfile,
-    displayCount,
-    displayFollow,
-    toggleFollow,
-    auth,
-    isOwnProfile,
-    isUpdatingFollow,
-    currentUserProfile}: userSideProps
+    { userProfile,
+        displayCount,
+        displayFollow,
+        toggleFollow,
+        auth,
+        isOwnProfile,
+        isUpdatingFollow,
+        currentUserProfile }: userSideProps
 ) => {
     const avatar = userProfile.profile.avatar
     const username = userProfile.username
+    const bio = userProfile.profile.bio
     return (
         <>
             <div className="w-full pr-4 lg:w-96 bg-neutral-900 border-l border-neutral-800">
@@ -23,7 +24,6 @@ export const UserSidebar = (
                         <Image src={avatar || "/img/nacho.png"} width={128} height={128} alt={username} loading="eager" preload={true} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
                     </div>
                     <p className="text-2xl font-mono mt-4 text-white">{userProfile.username}</p>
-                    {userProfile.bio && <p className="text-sm text-neutral-300 mt-2 text-center max-w-xs">{userProfile.bio}</p>}
                     <p className="text-sm font-extralight text-neutral-400 mt-2">{displayCount} подписчиков</p>
 
                     {auth.token && !isOwnProfile && (
@@ -34,7 +34,7 @@ export const UserSidebar = (
                         >
                             {isUpdatingFollow ? "..." : displayFollow ? "Unfollow" : "Follow"}
                         </button>
-                    )} 
+                    )}
 
                     <div className="relative z-20 flex justify-between pt-4 ">
                         {auth.token && isOwnProfile && (
@@ -64,6 +64,8 @@ export const UserSidebar = (
                             </div>
                         </div>
                     )}
+                   
+                    <p className="mt-3 text-sm text-ellipsis min-w-full max-w-full max-h-110 whitespace-pre-wrap wrap-break-word truncate bg-neutral-800/40 rounded-xl p-2">{bio}</p>
                 </div>
             </div>
         </>
