@@ -17,6 +17,7 @@ export function UserPage() {
     const username = params?.name as string;
     const auth = useAuth();
 
+
     const [activeTab, setActiveTab] = useState<"images" | "models" | "analytics">("images");
 
     const {
@@ -80,7 +81,7 @@ export function UserPage() {
                 </div>
                 <div className="">
                     <div className="flex flex-col lg:flex-row">
-                         <UserSidebar
+                        <UserSidebar
                             userProfile={userProfile}
                             displayCount={displayCount}
                             displayFollow={displayFollow}

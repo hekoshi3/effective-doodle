@@ -21,9 +21,9 @@ export const extractAIMetadata = async (
 ): Promise<AIParams> => {
   try {
     const image = sharp(filePath);
-    const metadata = await image.metadata();
+    const AImetadata = await image.metadata();
 
-    const textMetadata = (metadata as any).comments || {};
+    const textMetadata = (AImetadata as any).comments || {};
     const raw: string =
       textMetadata.parameters ||
       textMetadata[0].text ||
@@ -31,8 +31,8 @@ export const extractAIMetadata = async (
       '';
     const result: any = {
       raw: raw,
-      real_width: metadata.width,
-      real_height: metadata.height,
+      real_width: AImetadata.width,
+      real_height: AImetadata.height,
     };
 
     if (raw) {
