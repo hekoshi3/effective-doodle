@@ -134,7 +134,7 @@ export function MainPage() {
 
     return (
         <main className="bg-neutral-900 min-h-screen p-4 sm:p-8 text-white">
-            <div className="absolute right-0 left-0 top-15 flex justify-center mb-10">
+            <div className="absolute right-0 left-0 top-20 flex justify-center mb-10">
                 <div className="inline-flex bg-neutral-800 p-1 rounded-xl border border-neutral-700 shadow-lg">
                     <button
                         onClick={() => setFeedMode("global")}
@@ -158,7 +158,7 @@ export function MainPage() {
             </div>
 
             <section className="mb-16">
-                <div className="flex flex-col gap-4 mb-8">
+                <div className="flex flex-col gap-4 mt-15 md:mt-0 mb-8">
                     <h1 className="text-3xl font-bold tracking-tighter">
                         {feedMode === "following" ? "Images from Following" : "Images"}
                     </h1>
