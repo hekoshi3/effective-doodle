@@ -34,7 +34,8 @@ export class ImagesService {
         profile: {
           username: img.author.username,
           bio: img.author?.profile.bio ?? '',
-          avatar: this.mediaService.getAbsoluteUrl(img.author.profile.avatar),
+          avatar:
+            this.mediaService.getAbsoluteUrl(img.author.profile.avatar) || null,
         },
         followers_count: img.author._count?.followers || 0,
         is_following: false,

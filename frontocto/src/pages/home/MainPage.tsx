@@ -202,7 +202,7 @@ export function MainPage() {
                     <div className="text-center py-20 text-neutral-500 italic">No images found in this feed.</div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                        {gallery.map((img, i) => <AuthImageCard key={img.id} image={img} index={i} />)}
+                        {gallery.slice(0,10).map((img, i) => <AuthImageCard key={img.id} image={img} index={i} />)}
                     </div>
                 )}
             </section>
@@ -250,7 +250,7 @@ export function MainPage() {
                     <div className="text-center py-20 text-neutral-500 italic">No models found in this feed.</div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                        {models.slice(0, 18).map((model, i) => <AuthModelCard key={model.id} model={model} index={i} />)}
+                        {models.slice(0, 10).map((model, i) => <AuthModelCard key={model.id} model={model} index={i} />)}
                     </div>
                 )}
             </section>

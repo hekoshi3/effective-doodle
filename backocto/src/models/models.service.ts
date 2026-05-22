@@ -45,7 +45,9 @@ export class ModelsService {
         username: model.author.username,
         profile: {
           username: model.author.username,
-          avatar: this.mediaService.getAbsoluteUrl(model.author.profile.avatar),
+          avatar:
+            this.mediaService.getAbsoluteUrl(model.author.profile.avatar) ||
+            null,
         },
         followers_count: model.author._count?.followers || 0,
         is_following: false,
