@@ -47,19 +47,19 @@ export const UserSidebar = (
                     {currentUserProfile && (
                         <div className="grid grid-cols-2 gap-4 mt-4 w-full">
                             <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{currentUserProfile.stats.total_likes}</p>
+                                <p className="text-xl font-bold text-white">{userProfile.stats.total_likes}</p>
                                 <p className="text-[10px] uppercase text-neutral-500">Лайков</p>
                             </div>
                             <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{currentUserProfile.stats.total_downloads}</p>
+                                <p className="text-xl font-bold text-white">{userProfile.stats.total_downloads}</p>
                                 <p className="text-[10px] uppercase text-neutral-500">Загрузок</p>
                             </div>
                             <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{currentUserProfile.stats.images_count}</p>
+                                <p className="text-xl font-bold text-white">{userProfile.stats.images_count}</p>
                                 <p className="text-[10px] uppercase text-neutral-500">Изображений</p>
                             </div>
                             <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{currentUserProfile.stats.models_count}</p>
+                                <p className="text-xl font-bold text-white">{userProfile.stats.models_count}</p>
                                 <p className="text-[10px] uppercase text-neutral-500">Моделей</p>
                             </div>
                         </div>

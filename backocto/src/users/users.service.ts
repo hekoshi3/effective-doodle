@@ -65,6 +65,37 @@ export class UsersService {
 
     if (!user) throw new NotFoundException('User not found');
 
+    const [
+      downloadsAgg,
+      modelLikesAgg,
+      imageLikesAgg,
+      followersCount,
+      modelsCount,
+      imagesCount,
+    ] = await Promise.all([
+      this.prisma.aiModel.aggregate({
+        _sum: { downloadsCount: true },
+        where: { authorId: user.id },
+      }),
+      this.prisma.aiModel.aggregate({
+        _sum: { likesCount: true },
+        where: { authorId: user.id },
+      }),
+
+      this.prisma.generatedImage.aggregate({
+        _sum: { likesCount: true },
+        where: { authorId: user.id },
+      }),
+
+      this.prisma.userFollow.count({ where: { followingId: user.id } }),
+      this.prisma.aiModel.count({ where: { authorId: user.id } }),
+      this.prisma.generatedImage.count({ where: { authorId: user.id } }),
+    ]);
+
+    const totalLikes =
+      (modelLikesAgg._sum.likesCount || 0) +
+      (imageLikesAgg._sum.likesCount || 0);
+
     const result = {
       id: user.id,
       username: user.username,
@@ -76,6 +107,13 @@ export class UsersService {
       },
       followers_count: user._count.followers,
       is_following: currentUserId ? user.followers.length > 0 : false,
+      stats: {
+        total_downloads: downloadsAgg._sum.downloadsCount || 0,
+        total_likes: totalLikes,
+        followers: followersCount,
+        models_count: modelsCount,
+        images_count: imagesCount,
+      }, // !!! in external func in common
     };
 
     return result;
