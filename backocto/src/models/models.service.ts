@@ -15,6 +15,7 @@ import { UpdateModelDto } from './dto/update-model.dto';
 import { BaseQueryDto } from '../common/dto/query-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { MediaService } from '../common/media/media.service';
+import { AiModelType } from '@prisma/client';
 
 @Injectable()
 export class ModelsService {
@@ -46,7 +47,7 @@ export class ModelsService {
         profile: {
           username: model.author.username,
           avatar:
-            this.mediaService.getAbsoluteUrl(model.author.profile.avatar) ||
+            this.mediaService.getAbsoluteUrl(model.author?.profile?.avatar) ||
             null,
         },
         followers_count: model.author._count?.followers || 0,
@@ -78,12 +79,16 @@ export class ModelsService {
       .map((t) => t.trim())
       .filter(Boolean);
 
+    const modelTypeToUpperCase = String(
+      dto.model_type,
+    ).toUpperCase() as AiModelType;
+
     const result = await this.prisma.aiModel.create({
       data: {
         name: dto.name,
         file: filePath.replace(/\\/g, '/'),
         fileHash: fileHash,
-        modelType: dto.model_type,
+        modelType: modelTypeToUpperCase,
         description: dto.description || '',
         isPublished: false,
         author: { connect: { id: userId } },
