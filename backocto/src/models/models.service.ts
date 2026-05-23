@@ -15,7 +15,7 @@ import { UpdateModelDto } from './dto/update-model.dto';
 import { BaseQueryDto } from '../common/dto/query-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { MediaService } from '../common/media/media.service';
-import { AiModelType } from '@prisma/client';
+import { AiModelType } from '../generated/prisma/client';
 
 @Injectable()
 export class ModelsService {
