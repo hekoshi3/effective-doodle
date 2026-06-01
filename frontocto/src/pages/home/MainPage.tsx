@@ -160,7 +160,7 @@ export function MainPage() {
             <section className="mb-16">
                 <div className="flex flex-col gap-4 mt-15 md:mt-0 mb-8">
                     <h1 className="text-3xl font-bold tracking-tighter">
-                        {feedMode === "following" ? "Images from Following" : "Images"}
+                        {feedMode === "following" ? "Изображения из подписок" : "Изображения"}
                     </h1>
                     <div className="flex flex-wrap gap-2 items-center bg-neutral-800/30 p-3 rounded-lg border border-neutral-800">
                         {feedMode === "global" && (
@@ -210,7 +210,7 @@ export function MainPage() {
             <section>
                 <div className="flex flex-col gap-4 mb-8">
                     <h1 className="text-3xl font-bold tracking-tighter">
-                        {feedMode === "following" ? "Models from Following" : "Models"}
+                        {feedMode === "following" ? "Модели из подписок" : "Модели"}
                     </h1>
                     <div className="flex flex-wrap gap-2 items-center bg-neutral-800/30 p-3 rounded-lg border border-neutral-800">
                         <Select value={modelType} onChange={setModelType} placeholder="Тип" options={modelTypes} />
