@@ -91,14 +91,14 @@ export function GeneratePage() {
               </div>
             </div>
             <div>
-              <button type="submit" className="btn btn-neutral bg-neutral-800 border-0 outline-0" disabled={state.isGenerating}>
-                {state.isGenerating ? 'Generating...' : 'Generate'}
+              <button type="submit" className="btn btn-neutral bg-neutral-800 border-0 outline-0" disabled={true}> {/* state.isGenerating */}
+                {state.isGenerating ? 'Генерация...' : 'Сгенерировать'}
               </button>
             </div>
           </form>
           <div className="absolute bottom-11">
             <button type="button" className="btn btn-neutral bg-neutral-800 border-0 " disabled={state.isGenerating || !imageInfo.imgUrl} onClick={func.handleUpload}>
-              {imageInfo.imgUrl ? 'Send to draft' : 'Waiting for an image'}
+              {imageInfo.imgUrl ? 'Отправить в черновик' : 'Ожидание генерации...'}
             </button>
           </div>
           {state.error && <p className="error">{state.error}</p>}

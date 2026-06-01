@@ -16,8 +16,8 @@ export function AuthPage() {
           </h1>
           <p className="text-neutral-400">
             {isLogin
-              ? "Welcome back! Please login to your account."
-              : "Create a new account to get started."}
+              ? "С возвращением!"
+              : "Добро пожаловать!"}
           </p>
         </div>
 
@@ -32,7 +32,7 @@ export function AuthPage() {
               name="username"
               required
               className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your username"
+              placeholder="Введите юзернейм"
               autoComplete="on"
             />
           </div>
@@ -47,7 +47,7 @@ export function AuthPage() {
               name="password"
               required
               className="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
+              placeholder="Введите пароль"
               autoComplete="on"
             />
           </div>
@@ -63,7 +63,7 @@ export function AuthPage() {
             disabled={isLoading}
             className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
           >
-            {isLoading ? <span className="loading loading-ring loading-xl"></span> : isLogin ? "Login" : "Register"}
+            {isLoading ? <span className="loading loading-ring loading-xl"></span> : isLogin ? "Вход" : "Регистрация"}
           </button>
         </form>
 
@@ -74,8 +74,8 @@ export function AuthPage() {
             className="text-blue-400 hover:text-blue-300 text-sm"
           >
             {isLogin
-              ? "Don't have an account? Register"
-              : "Already have an account? Login"}
+              ? "Ещё нет аккаунта? Зарегестрироваться"
+              : "Уже есть аккаунт? Войти"}
           </button>
         </div>
       </div>

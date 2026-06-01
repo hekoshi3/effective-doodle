@@ -49,7 +49,7 @@ export function ImageUploadPage() {
                 router.push(`/image/edit/${imageId}`);
             }
         } catch (e) {
-            console.error("Redirect error:", e); alert("Upload successful, but failed to redirect. Check console.");
+            console.error("Redirect error:", e); alert("Загружено, но произошла ошибка редиректа.");
         } finally {
             setIsSubmitting(false);
         }
@@ -81,11 +81,11 @@ export function ImageUploadPage() {
                     onClick={() => router.back()}
                     className="mb-6 text-neutral-400 hover:text-white transition-colors"
                 >
-                    ← Back
+                    ← Вернуться
                 </button>
 
                 <div className="flex flex-col gap-8 items-center">
-                    <h1 className="text-3xl font-bold">Upload New Image</h1>
+                    <h1 className="text-3xl font-bold">Загрузить изображение</h1>
 
                     <div className="w-full max-w-2xl">
                         <div className="relative aspect-video w-full bg-neutral-800 rounded-2xl border-2 border-dashed border-neutral-700 hover:border-accent transition-colors overflow-hidden group">
@@ -95,7 +95,7 @@ export function ImageUploadPage() {
                                         <svg className="w-12 h-12 mb-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
-                                        <p className="text-sm text-neutral-400">Click to upload or drag and drop</p>
+                                        <p className="text-sm text-neutral-400">Нажмите, чтобы выбрать изображение</p>
                                     </div>
                                     <input type="file" className="hidden" onChange={imageChange} accept="image/*" autoComplete="off"/>
                                 </label>
@@ -103,14 +103,14 @@ export function ImageUploadPage() {
                                 <div className="relative w-full h-full">
                                     <Image
                                         src={previewUrl!}
-                                        alt="Preview"
+                                        alt="Превью"
                                         fill
                                         className="object-contain p-4"
                                     />
                                     <button
                                         onClick={removeSelectedImage}
                                         className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-lg transition-colors"
-                                        title="Remove image"
+                                        title="Отменить"
                                     >
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -129,10 +129,10 @@ export function ImageUploadPage() {
                                 {isSubmitting ? (
                                     <>
                                         <span className="loading loading-spinner"></span>
-                                        Uploading...
+                                        Загрузка...
                                     </>
                                 ) : (
-                                    "Continue to Edit"
+                                    "Перейти к черновику"
                                 )}
                             </button>
                         </div>

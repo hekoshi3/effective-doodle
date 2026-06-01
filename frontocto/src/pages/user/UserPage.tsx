@@ -49,8 +49,8 @@ export function UserPage() {
     if (error || !userProfile) {
         return (
             <main className="flex w-screen items-center justify-center min-h-screen bg-neutral-900">
-                <div className="text-red-100 text-xl">{"User not found"}</div>
-                <Link href="/" className="ml-4 text-blue-400 hover:underline">Go back</Link>
+                <div className="text-red-100 text-xl">{"Запрашиваемый ресурс не обнаружен"}</div>
+                <Link href="/" className="ml-4 text-blue-400 hover:underline">На главную</Link>
             </main>
         );
     }
@@ -110,7 +110,7 @@ export function UserPage() {
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                                         {gallery.map((img, index) => <AuthImageCard key={img.id ?? index} image={img} index={index} />)}
                                     </div>
-                                ) : <div className="flex items-center justify-center h-64 text-neutral-400">No images yet</div>
+                                ) : <div className="flex items-center justify-center h-64 text-neutral-400">Изображений ещё нет</div>
                             )}
 
                             {activeTab === "models" && (
@@ -118,7 +118,7 @@ export function UserPage() {
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                                         {models.map((model, index) => <AuthModelCard key={model.id ?? index} model={model} index={index} />)}
                                     </div>
-                                ) : <div className="flex items-center justify-center h-64 text-neutral-400">No models yet</div>
+                                ) : <div className="flex items-center justify-center h-64 text-neutral-400">Моделей ещё нет</div>
                             )}
 
                             {activeTab === "analytics" && (
@@ -162,7 +162,7 @@ export function UserPage() {
                                         </>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-neutral-800 rounded-3xl text-neutral-500">
-                                            <p>Аналитика для этого пользователя пока недоступна</p>
+                                            <p>Аналитика пока недоступна</p>
                                         </div>
                                     )}
                                 </div>

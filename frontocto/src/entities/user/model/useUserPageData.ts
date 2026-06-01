@@ -17,7 +17,7 @@ export function useUserPageData(username: string, auth: AuthContextType) {
 
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [currentUserProfile, setCurUserProfile] = useState<User | null>(null);
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [analytics, ] = useState<Analytics | null>(null); // setAnalytics
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [models, setModels] = useState<Model[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,9 +40,10 @@ export function useUserPageData(username: string, auth: AuthContextType) {
         if (!userRes.ok) notFound();
 
         const userData: User = await userRes.json();
-        //console.log(userData)
+
         setUserProfile(userData);
 
+        /* !!!
         const analyticsRes = auth.token
           ? await makeAuthenticatedRequest(`${API_HOST}/users/analytics/`)
           : await fetch(`${API_HOST}/users/analytics/`);
@@ -51,7 +52,7 @@ export function useUserPageData(username: string, auth: AuthContextType) {
           const analyticsData: Analytics = await analyticsRes.json();
           setAnalytics(analyticsData);
         }
-
+        */
         if (auth.token) {
           try {
             const meRes = await makeAuthenticatedRequest(
@@ -92,7 +93,7 @@ export function useUserPageData(username: string, auth: AuthContextType) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.error("Error loading user data:", err);
-        setError(err.message || "Failed to load user data");
+        setError(err.message || "Произошла ошибка при обновлении данных");
       } finally {
         setIsLoading(false);
       }

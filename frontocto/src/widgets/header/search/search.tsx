@@ -76,7 +76,7 @@ export const NavbarSearch = () => {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => query.length >= 2 && setIsOpen(true)}
-                    placeholder="Search images or models..."
+                    placeholder="Начните вводить..."
                     className="w-full bg-neutral-800 border border-neutral-700 text-white text-sm rounded-full py-2 px-10 focus:outline-none focus:border-accent transition-all"
                     data-dashlane-ignore="true"
                     data-bitwarden-no-autofill="true"
@@ -150,7 +150,7 @@ export const NavbarSearch = () => {
 
             {isOpen && query.length >= 2 && results.images.length === 0 && results.models.length === 0 && !isLoading && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-neutral-800 border border-neutral-700 rounded-xl p-4 text-center text-sm text-neutral-500 z-1000">
-                    No results for &quot;{query}&quot;
+                    По запросу &quot;{query}&quot; ничего не найдено
                 </div>
             )}
         </div>

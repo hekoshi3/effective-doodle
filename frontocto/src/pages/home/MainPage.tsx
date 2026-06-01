@@ -39,18 +39,18 @@ const Select = ({ value, onChange, options = [], placeholder, className = "" }: 
 );
 
 const DATE_OPTIONS = [
-    { value: "today", label: "Today" },
-    { value: "week", label: "This Week" },
-    { value: "month", label: "This Month" },
-    { value: "6months", label: "6 Months" },
-    { value: "year", label: "Year" },
+    { value: "today", label: "Сегодня" },
+    { value: "week", label: "Эта неделя" },
+    { value: "month", label: "Этот месяц" },
+    { value: "6months", label: "За 6 месяцев" },
+    { value: "year", label: "За год" },
 ];
 
 const LIKE_OPTIONS = [
-    { value: "10", label: "10+ Likes" },
-    { value: "50", label: "50+ Likes" },
-    { value: "100", label: "100+ Likes" },
-    { value: "500", label: "500+ Likes" },
+    { value: "10", label: "10+ лайков" },
+    { value: "50", label: "50+ лайков" },
+    { value: "100", label: "100+ лайков" },
+    { value: "500", label: "500+ лайков" },
 ];
 
 export function MainPage() {
@@ -140,19 +140,19 @@ export function MainPage() {
                         onClick={() => setFeedMode("global")}
                         className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${feedMode === "global" ? 'bg-accent text-black' : 'text-neutral-400 hover:text-white'}`}
                     >
-                        Global
+                        Общая
                     </button>
                     <button
                         onClick={() => {
                             if (!auth.token) {
-                                alert("Please login to see followed users feed");
+                                alert("Для просмотра ленты подписок нужно войти в аккаунт");
                                 return;
                             }
                             setFeedMode("following");
                         }}
                         className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${feedMode === "following" ? 'bg-accent text-black' : 'text-neutral-400 hover:text-white'}`}
                     >
-                        Following
+                        Подписки
                     </button>
                 </div>
             </div>
@@ -167,39 +167,39 @@ export function MainPage() {
                             <Select
                                 value={imgAuthor}
                                 onChange={setImgAuthor}
-                                placeholder="User"
+                                placeholder="Пользователь"
                                 options={users.map(u => ({ value: u.id.toString(), label: u.username }))}
                             />
                         )}
                         <Select
                             value={imgLinkedModel}
                             onChange={setImgLinkedModel}
-                            placeholder="Base Model"
+                            placeholder="Модель"
                             options={availableModels.map(m => ({ value: m.id.toString(), label: m.name }))}
                         />
                         <input
                             type="text"
                             value={imgTag}
                             onChange={(e) => setImgTag(e.target.value)}
-                            placeholder="Exact Tag..."
+                            placeholder="Введите тэг..." // !!! tag autocomplete
                             className="bg-neutral-800 text-sm p-2 rounded border border-neutral-700 w-32 outline-none focus:border-accent"
                             autoComplete="off"
                         />
-                        <Select value={imgMinLikes} onChange={setImgMinLikes} placeholder="Min Likes" options={LIKE_OPTIONS} />
-                        <Select value={imgDateRange} onChange={setImgDateRange} placeholder="Time Range" options={DATE_OPTIONS} />
+                        <Select value={imgMinLikes} onChange={setImgMinLikes} placeholder="Лайки" options={LIKE_OPTIONS} />
+                        <Select value={imgDateRange} onChange={setImgDateRange} placeholder="Время" options={DATE_OPTIONS} />
                         <Select
                             value={imgSort}
                             onChange={setImgSort}
-                            placeholder="Sort"
+                            placeholder="Сортировка"
                             options={[
-                                { value: "-created_at", label: "Newest" },
-                                { value: "-likes_count", label: "Popular" },
+                                { value: "-created_at", label: "Новое" },
+                                { value: "-likes_count", label: "Популярное" },
                             ]}
                         />
                     </div>
                 </div>
                 {gallery.length === 0 && !auth.isLoading ? (
-                    <div className="text-center py-20 text-neutral-500 italic">No images found in this feed.</div>
+                    <div className="text-center py-20 text-neutral-500 italic">Не найдено изображений по текущему запросу.</div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                         {gallery.slice(0,10).map((img, i) => <AuthImageCard key={img.id} image={img} index={i} />)}
@@ -213,12 +213,12 @@ export function MainPage() {
                         {feedMode === "following" ? "Models from Following" : "Models"}
                     </h1>
                     <div className="flex flex-wrap gap-2 items-center bg-neutral-800/30 p-3 rounded-lg border border-neutral-800">
-                        <Select value={modelType} onChange={setModelType} placeholder="Type" options={modelTypes} />
+                        <Select value={modelType} onChange={setModelType} placeholder="Тип" options={modelTypes} />
                         {feedMode === "global" && (
                             <Select
                                 value={modelAuthor}
                                 onChange={setModelAuthor}
-                                placeholder="User"
+                                placeholder="Пользователь"
                                 options={users.map(u => ({ value: u.id.toString(), label: u.username }))}
                             />
                         )}
@@ -226,13 +226,13 @@ export function MainPage() {
                             type="text"
                             value={modelTag}
                             onChange={(e) => setModelTag(e.target.value)}
-                            placeholder="Exact Tag..."
+                            placeholder="Введите тэг..."
                             className="bg-neutral-800 text-sm p-2 rounded border border-neutral-700 w-32 outline-none focus:border-accent"
                             autoComplete="off"
                         />
-                        <Select value={modelMinLikes} onChange={setModelMinLikes} placeholder="Min Likes" options={LIKE_OPTIONS} />
-                        <Select value={modelMinDownloads} onChange={setModelMinDownloads} placeholder="Min DL" options={[{ value: "50", label: "50+ DL" }, { value: "200", label: "200+ DL" }, { value: "1000", label: "1000+ DL" }]} />
-                        <Select value={modelDateRange} onChange={setModelDateRange} placeholder="Time Range" options={DATE_OPTIONS} />
+                        <Select value={modelMinLikes} onChange={setModelMinLikes} placeholder="Лайки" options={LIKE_OPTIONS} />
+                        <Select value={modelMinDownloads} onChange={setModelMinDownloads} placeholder="Скачивания" options={[{ value: "50", label: "50+ DL" }, { value: "200", label: "200+ DL" }, { value: "1000", label: "1000+ DL" }]} />
+                        <Select value={modelDateRange} onChange={setModelDateRange} placeholder="Время" options={DATE_OPTIONS} />
                         <Select
                             value={modelSort}
                             onChange={setModelSort}
@@ -247,7 +247,7 @@ export function MainPage() {
                     </div>
                 </div>
                 {models.length === 0 && !auth.isLoading ? (
-                    <div className="text-center py-20 text-neutral-500 italic">No models found in this feed.</div>
+                    <div className="text-center py-20 text-neutral-500 italic">Не найдено моделей по текущему запросу.</div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                         {models.slice(0, 10).map((model, i) => <AuthModelCard key={model.id} model={model} index={i} />)}

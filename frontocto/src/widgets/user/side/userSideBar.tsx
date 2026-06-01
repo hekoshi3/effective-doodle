@@ -32,14 +32,14 @@ export const UserSidebar = (
                             disabled={isUpdatingFollow}
                             className={`mt-4 px-6 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${displayFollow ? "bg-neutral-700 hover:bg-neutral-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
                         >
-                            {isUpdatingFollow ? "..." : displayFollow ? "Unfollow" : "Follow"}
+                            {isUpdatingFollow ? "..." : displayFollow ? "Отписаться" : "Подписаться"}
                         </button>
                     )}
 
                     <div className="relative z-20 flex justify-between pt-4 ">
                         {auth.token && isOwnProfile && (
                             <Link href={`/settings`} className="btn bg-neutral-900 rounded-xl font-light opacity-80 hover:opacity-100 hover:bg-neutral-800 transition-opacity">
-                                Редактировать
+                                Настройки
                             </Link>
                         )}
                     </div>

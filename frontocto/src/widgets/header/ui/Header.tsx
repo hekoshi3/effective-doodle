@@ -83,7 +83,7 @@ export const Header = () => {
                 {token && (
                   <>
                     <Link href="/generate" className="hover:underline">
-                      Generate
+                      Генерация
                     </Link>
                     <details className="dropdown">
                       <summary className="m-1 bg-transparent">Загрузить</summary>
@@ -94,7 +94,7 @@ export const Header = () => {
                     </details>
                     <NotificationBell></NotificationBell>
                     <Link href="/user" className="hover:underline">
-                      User
+                      Профиль
                     </Link>
                   </>
                 )}
@@ -105,11 +105,11 @@ export const Header = () => {
                         onClick={handleLogout}
                         className="hover:underline cursor-pointer"
                       >
-                        Logout
+                        Выйти
                       </button>
                     ) : (
                       <Link href="/auth" className="hover:underline">
-                        Login
+                        Войти
                       </Link>
                     )}
                   </>

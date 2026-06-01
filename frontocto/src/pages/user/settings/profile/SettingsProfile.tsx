@@ -84,28 +84,28 @@ export function SettingsProfile() {
 
     return (
         <>
-            <div className="flex border min-w-7xl pt-20 justify-center">
+            <div className="flex pt-20 justify-center">
                 <Form action={handleSubmit}>
                     <ul className="list">
-                        <li className="tracking-wide text-2xl">Profile</li>
-                        <li className="list-row flex justify-between items-center min-w-xl">
-                            <div><p className="text-xl">Avatar</p></div>
+                        <li className="tracking-wide text-2xl">Профиль</li>
+                        <li className="list-row flex justify-between items-center ">
+                            <div><p className="text-xl">Аватар</p></div>
                             {selectedAvatarImage ?
-                                <button onClick={removeSelectedAvatarImage} className="btn">Remove {selectedAvatarImage.name}</button>
+                                <button onClick={removeSelectedAvatarImage} className="btn">Отменить {selectedAvatarImage.name}</button>
                                 : <input type="file" name="avatar" className="file-input text-xs bg-neutral-800" onChange={(e) => handleImageChange(e, setSelectedAvatarImage)} accept="image/png, image/jpeg, image/webp" />}
                         </li>
-                        <li className="list-row flex justify-between items-center min-w-xl">
-                            <div><p className="text-xl">Banner</p></div>
+                        <li className="list-row flex justify-between items-center ">
+                            <div><p className="text-xl">Баннер</p></div>
                             {selectedBannerImage ?
-                                <button onClick={removeSelectedBannerImage} className="btn"> Remove {selectedBannerImage.name}</button>
+                                <button onClick={removeSelectedBannerImage} className="btn"> Отменить {selectedBannerImage.name}</button>
                                 : <input type="file" name="banner" className="file-input text-xs bg-neutral-800" onChange={(e) => handleImageChange(e, setSelectedBannerImage)} accept="image/png, image/jpeg, image/webp" />}
                         </li>
-                        <li className="list-row flex justify-between items-center min-w-xl">
-                            <div><p className="text-xl">Name</p></div>
-                            <input type="text" name="name" className="input bg-neutral-800" onChange={bioChange} disabled title="You cannot change your username" />
+                        <li className="list-row flex justify-between items-center ">
+                            <div><p className="text-xl">Имя</p></div>
+                            <input type="text" name="name" className="input bg-neutral-800" onChange={bioChange} disabled title="Изменение никнейма невозможно" />
                         </li>
-                        <li className="list-row flex justify-between items-center min-w-xl">
-                            <div><p className="text-xl">Bio</p></div>
+                        <li className="list-row flex justify-between items-center ">
+                            <div><p className="text-xl">Биография</p></div>
                             <textarea onChange={bioChange} maxLength={500} name="bio" className="input bg-neutral-800 h-20 p-1" placeholder=""></textarea>
                         </li>
                     </ul>
@@ -117,10 +117,10 @@ export function SettingsProfile() {
                         {isSubmitting ? (
                             <>
                                 <span className="loading loading-spinner"></span>
-                                Saving...
+                                Сохранение...
                             </>
                         ) : (
-                            "Save"
+                            "Сохранить"
                         )}
                     </button>
                 </Form>

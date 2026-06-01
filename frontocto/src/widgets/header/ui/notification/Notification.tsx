@@ -58,11 +58,11 @@ export const NotificationBell = () => {
 
     const getNotificationText = (n: Notif) => {
         switch (n.type) {
-            case 'LIKE': return `liked your post`;
-            case 'COMMENT': return `commented on your post`;
-            case 'FOLLOW': return `started following you`;
-            case 'NEW_POST': return `published a new post`;
-            default: return `interacted with you`;
+            case 'LIKE': return `поставил лайк на пост`;
+            case 'COMMENT': return `оставил комментарий`;
+            case 'FOLLOW': return `подписался`;
+            case 'NEW_POST': return `опубликовал новый пост`;
+            default: return `упомянул вас`;
         }
     };
 
@@ -84,7 +84,7 @@ export const NotificationBell = () => {
 
             <ul className="max-w-screen -translate-x-6 lg:translate-x-0 dropdown-content z-100 mt-3 p-2 shadow-2xl bg-neutral-800 border border-neutral-700 rounded-xl w-80 sm:w-96 flex flex-col gap-1 max-h-125 overflow-y-auto overflow-x-hidden">
                 <li className="p-3 border-b border-neutral-700 flex justify-between items-center sticky top-0 bg-neutral-800 z-10">
-                    <span className="font-bold text-white">Notifications</span>
+                    <span className="font-bold text-white">Уведомления</span>
                     {unreadCount > 0 && (
                         <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full font-black">
                             {unreadCount} NEW
@@ -125,7 +125,7 @@ export const NotificationBell = () => {
                                         <button
                                             onClick={(e) => markAsRead(e, n.id)}
                                             className="shrink-0 w-6 h-6 rounded-full bg-neutral-700 hover:bg-accent hover:text-black flex items-center justify-center transition-all shadow-lg"
-                                            title="Mark as read"
+                                            title="Отметить прочитанным"
                                         >
                                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                                         </button>

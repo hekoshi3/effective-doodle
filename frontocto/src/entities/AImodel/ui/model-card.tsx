@@ -10,7 +10,7 @@ export const ModelCard = ({ model, statusBadge, index = 0 }: ModelCardProps) => 
             <Link href={`/model/${model.id}`} className="block relative w-full aspect-2/3">
                 <Image
                     src={model.featured_image_url || "/image404.png"}
-                    alt={model.name || "Model"}
+                    alt={model.name || "Модель"}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -58,7 +58,7 @@ export const ModelCard = ({ model, statusBadge, index = 0 }: ModelCardProps) => 
                                 { model.author.username  }
                             </h4>
                             <p className="text-[10px] text-neutral-400 truncate">
-                                {model.author.followers_count} followers
+                                {model.author.followers_count} подписчиков
                             </p>
                         </div>
                     </Link>

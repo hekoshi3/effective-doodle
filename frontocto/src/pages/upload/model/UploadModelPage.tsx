@@ -114,25 +114,13 @@ export function ModelUploadPage() {
                 <button onClick={() => router.back()} className="mb-6 text-neutral-400 hover:text-white">← Back</button>
 
                 <div className="flex flex-col gap-8 items-center">
-                    <h1 className="text-3xl font-bold">Upload New Model</h1>
+                    <p className="py-2 bg-neutral-800 px-10 rounded-xl">Внимание! В данный момент поддерживаются только модели до 100 мегабайт.</p>
+                    <h1 className="text-3xl font-bold">Загрузить модель</h1>
 
                     <form className="w-full max-w-2xl flex flex-col gap-6">
 
                         <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
-                            <label className="block text-sm font-medium mb-2 text-neutral-400">Model Name *</label>
-                            <input
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="e.g. My Awesome LoRA"
-                                className="input input-bordered w-full bg-neutral-700 border-neutral-600 focus:border-accent"
-                                required
-                                autoComplete="off"
-                            />
-                        </div>
-
-                        <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
-                            <label className="block text-sm font-medium mb-2 text-neutral-400">Model Type *</label>
+                            <label className="block text-sm font-medium mb-2 text-neutral-400">* Выберите тип модели</label>
                             <select
                                 value={modelType}
                                 onChange={(e) => setModelType(e.target.value)}
@@ -145,23 +133,36 @@ export function ModelUploadPage() {
                         </div>
 
                         <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
-                            <label className="block text-sm font-medium mb-2 text-neutral-400">Model File *</label>
+                            <label className="block text-sm font-medium mb-2 text-neutral-400">* Выберите файл модели (Принимаются только .safetensors, .ckpt, .pt)</label>
                             <input
                                 type="file"
                                 onChange={handleModelFileChange}
                                 className="file-input file-input-bordered file-input-accent w-full bg-neutral-700"
-                                accept=".safetensors,.ckpt,.pt,.zip,.bin"
+                                accept=".safetensors,.ckpt,.pt"
                                 required
                                 autoComplete="off"
                             />
                         </div>
 
                         <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
-                            <label className="block text-sm font-medium mb-2 text-neutral-400">Preview Image (Thumbnail)</label>
+                            <label className="block text-sm font-medium mb-2 text-neutral-400">* Название модели</label>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Название модели"
+                                className="input input-bordered w-full bg-neutral-700 border-neutral-600 focus:border-accent"
+                                required
+                                autoComplete="off"
+                            />
+                        </div>
+
+                        <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
+                            <label className="block text-sm font-medium mb-2 text-neutral-400">Обложка модели (Превью)</label>
                             <div className="relative aspect-video w-full bg-neutral-900 rounded-xl border-2 border-dashed border-neutral-600 hover:border-accent overflow-hidden">
                                 {!previewImage ? (
                                     <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-                                        <span className="text-sm text-neutral-500">Upload cover image</span>
+                                        <span className="text-sm text-neutral-500">Нажмите, чтобы выбрать обложку</span>
                                         <input type="file" className="hidden" onChange={(e) => setPreviewImage(e.target.files?.[0] || null)} accept="image/*" autoComplete="off"/>
                                     </label>
                                 ) : (
@@ -178,7 +179,7 @@ export function ModelUploadPage() {
                             disabled={!modelFile || !name || isSubmitting}
                             className={`btn btn-lg w-full ${isSubmitting ? 'btn-disabled' : 'btn-accent'}`}
                         >
-                            {isSubmitting ? <span className="loading loading-spinner"></span> : "Upload and Continue"}
+                            {isSubmitting ? <span className="loading loading-spinner"></span> : "Отправить"}
                         </button>
                     </form>
                 </div>

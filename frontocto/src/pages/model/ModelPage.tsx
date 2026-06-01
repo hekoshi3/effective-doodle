@@ -49,7 +49,7 @@ export function ModelDetailPage() {
                     ? await makeAuthenticatedRequest(`${API_HOST}/models/${modelId}/`)
                     : await fetch(`${API_HOST}/models/${modelId}/`);
                 
-                if (!modelRes.ok) throw new Error("Failed to fetch model");
+                if (!modelRes.ok) throw new Error("Произошла ошибка");
                 
                 const modelData: Model = await modelRes.json();
                 setModel(modelData);
@@ -69,7 +69,7 @@ export function ModelDetailPage() {
                 }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
-                setError(err.message || "Failed to load model");
+                setError(err.message || "Произошла ошибка при загрузке модели");
             } finally {
                 setIsLoading(false);
             }
@@ -160,15 +160,14 @@ export function ModelDetailPage() {
     };
 
     if (isLoading) return <main className="flex w-screen items-center justify-center min-h-screen bg-neutral-900"><div className="loading loading-ring loading-xl text-white"></div></main>;
-    if (error || !model || (!isAuthor && !model.is_published)) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Model not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
+    if (error || !model || (!isAuthor && !model.is_published)) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Запрашиваемый ресурс не обнаружен"}</p><Link href="/" className="mt-4 text-accent hover:underline">На главную</Link></main>; // !!! make use~ component
 
     return (
         <main className="bg-neutral-900 min-h-screen pb-20">
             <div className="container mx-auto px-4 py-8 max-w-7xl">
-                <button onClick={() => router.back()} className="mb-6 text-neutral-400 hover:text-white transition-colors flex items-center gap-2">← Back</button>
+                <button onClick={() => router.back()} className="mb-6 text-neutral-400 hover:text-white transition-colors flex items-center gap-2">← Вернуться</button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    {/* Left Column - Visuals */}
                     <div className="flex flex-col gap-6">
                         <div className="relative w-full aspect-square bg-neutral-800 rounded-2xl overflow-hidden border border-neutral-700 shadow-2xl">
                             <Image
@@ -181,18 +180,16 @@ export function ModelDetailPage() {
                         </div>
                     </div>
 
-                    {/* Right Column - Information */}
                     <div className="flex flex-col gap-8">
-                        {/* Header Section */}
                         <div className="flex justify-between items-start gap-4">
                             <div className="flex-1">
                                 <h1 className="text-4xl font-bold text-white mb-3 leading-tight">{model.name || "Unnamed Model"}</h1>
                                 <div className="flex flex-wrap items-center gap-2">
                                     <span className="px-3 py-1 bg-accent/20 text-accent border border-accent/30 rounded-full text-xs font-bold uppercase">
-                                        {model.model_type || "Unknown Type"}
+                                        {model.model_type || "Неизвестно"}
                                     </span>
                                     {!model.is_published && (
-                                        <span className="px-3 py-1 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 rounded-full text-xs font-bold uppercase">Draft</span>
+                                        <span className="px-3 py-1 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 rounded-full text-xs font-bold uppercase">Черновик</span>
                                     )}
                                 </div>
                             </div>
@@ -202,12 +199,11 @@ export function ModelDetailPage() {
                                     className="bg-neutral-700 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-semibold flex items-center gap-2"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                                    Edit
+                                    Редактировать
                                 </Link>
                             )}
                         </div>
 
-                        {/* Author */}
                         <div className="flex items-center gap-4 bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
                             <Link href={`/user/${model.author.username}`} className="flex items-center gap-4 group">
                                 <Image
@@ -218,12 +214,11 @@ export function ModelDetailPage() {
                                 />
                                 <div>
                                     <h2 className="text-xl font-bold text-white group-hover:text-accent transition-colors">@{model.author.username}</h2>
-                                    <p className="text-sm text-neutral-400">{model.author.followers_count} followers</p>
+                                    <p className="text-sm text-neutral-400">{model.author.followers_count} подписчиков</p>
                                 </div>
                             </Link>
                         </div>
 
-                        {/* Tags */}
                         {tags.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                                 {tags.map(tag => (
@@ -232,15 +227,13 @@ export function ModelDetailPage() {
                             </div>
                         )}
 
-                        {/* Description */}
                         <div className="bg-neutral-800 p-6 rounded-2xl border border-neutral-700">
                             <h3 className="text-sm uppercase tracking-widest text-neutral-500 font-bold mb-4">Description</h3>
                             <p className="text-neutral-300 leading-relaxed whitespace-pre-wrap wrap-break-word">
-                                {model.description || <span className="italic opacity-50">No description provided.</span>}
+                                {model.description || <span className="italic opacity-50">Описание не задано.</span>}
                             </p>
                         </div>
 
-                        {/* Stats & Download */}
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between p-4 bg-neutral-800/30 rounded-xl border border-neutral-700/30">
                                 <div className="flex items-center gap-6">
@@ -265,14 +258,13 @@ export function ModelDetailPage() {
                                 disabled={isDownloading}
                                 className="w-full bg-accent hover:bg-opacity-80 text-black font-black py-4 rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-accent/10 disabled:opacity-50"
                             >
-                                {isDownloading ? <span className="loading loading-spinner"></span> : <>DOWNLOAD MODEL <span className="opacity-50 text-xs">({model.file_hash?.substring(0,8) || "N/A"})</span></>}
+                                {isDownloading ? <span className="loading loading-spinner"></span> : <>СКАЧАТЬ МОДЕЛЬ <span className="opacity-50 text-xs">{model.file_hash?.substring(0,8) || ""}</span></>}
                             </button>
                         </div>
 
-                        {/* Comments Section */}
                         <div className="mt-8 border-t border-neutral-800 pt-10">
                             <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-                                Comments <span className="text-sm bg-neutral-800 px-3 py-1 rounded-full text-neutral-500">{comments.length}</span>
+                                Комментарии <span className="text-sm bg-neutral-800 px-3 py-1 rounded-full text-neutral-500">{comments.length}</span>
                             </h3>
 
                             {auth.token ? (
@@ -280,7 +272,7 @@ export function ModelDetailPage() {
                                     <textarea
                                         value={commentText}
                                         onChange={(e) => setCommentText(e.target.value)}
-                                        placeholder="Add a comment..."
+                                        placeholder="Введите комментарий..."
                                         className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-xl p-4 min-h-25 focus:border-accent outline-none transition-all"
                                         disabled={isSubmittingComment}
                                     />
@@ -290,19 +282,19 @@ export function ModelDetailPage() {
                                             disabled={!commentText.trim() || isSubmittingComment}
                                             className="bg-neutral-200 text-black px-6 py-2 rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50"
                                         >
-                                            {isSubmittingComment ? "Posting..." : "Post Comment"}
+                                            {isSubmittingComment ? "Отправка..." : "Отправить"}
                                         </button>
                                     </div>
                                 </form>
                             ) : (
                                 <div className="bg-neutral-800/50 border border-neutral-700 border-dashed p-6 rounded-xl text-center mb-8">
-                                    <p className="text-neutral-400 text-sm">Please <Link href="/auth" className="text-accent hover:underline">login</Link> to leave a comment</p>
+                                    <p className="text-neutral-400 text-sm"><Link href="/auth" className="text-accent hover:underline">Войдите</Link>, чтобы прокомментировать</p>
                                 </div>
                             )}
 
                             <div className="space-y-6">
                                 {comments.length === 0 ? (
-                                    <p className="text-neutral-500 text-center py-10 italic">No comments yet. Be the first!</p>
+                                    <p className="text-neutral-500 text-center py-10 italic">Ещё ничего нет. Станьте первым!</p>
                                 ) : (
                                     comments.map((comment) => (
                                         <div key={comment.id} className="flex gap-4 group">
