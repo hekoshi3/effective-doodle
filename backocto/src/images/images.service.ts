@@ -21,8 +21,18 @@ export class ImagesService {
   ) {}
 
   private mapImage(img: any, currentUserId?: number) {
+    const { generation_params, ...cleanImg } = img;
+    let filteredParams = undefined;
+    if (generation_params) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { raw, ...restParams } = generation_params;
+      filteredParams = restParams;
+    }
     return {
-      ...img,
+      ...cleanImg,
+      ...(filteredParams !== undefined && {
+        generation_params: filteredParams,
+      }),
       image: this.mediaService.getAbsoluteUrl(img.image),
       is_published: img.isPublished,
       likes_count: img.likes_count ?? img._count?.likes ?? 0,
@@ -227,12 +237,28 @@ export class ImagesService {
     if (!existing || existing.authorId !== userId)
       throw new NotFoundException('Image not found');
 
-    const { tags, is_published, linked_model, ...data } = dto;
+    const {
+      tags,
+      is_published,
+      linked_model,
+      prompt,
+      negative_prompt,
+      ...data
+    } = dto;
+
+    const exisitngGenParams =
+      (existing.generation_params as Record<string, any>) || {};
+    const updatedGenParams = {
+      ...exisitngGenParams,
+      ...(prompt !== undefined && { prompt }),
+      ...(negative_prompt !== undefined && { negative_prompt }),
+    };
 
     const updated = await this.prisma.generatedImage.update({
       where: { id },
       data: {
         ...data,
+        generation_params: updatedGenParams,
         isPublished: is_published,
         ...(linked_model && { linkedModel: { connect: { id: linked_model } } }),
         ...(tags && {
@@ -261,7 +287,7 @@ export class ImagesService {
     if (updated.isPublished) {
       this.notifService
         .notifyFollowers(userId, 'NEW_POST', { imageId: updated.id })
-        .catch((e) => console.error('Notification background error:', e)); // Безопасный перехват
+        .catch((e) => console.error('Notification background error:', e));
     }
 
     return this.mapImage(updated);

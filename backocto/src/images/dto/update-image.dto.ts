@@ -25,4 +25,12 @@ export class UpdateImageDto {
   @IsOptional()
   @IsNumber()
   linked_model?: number;
+
+  @IsOptional()
+  @IsString()
+  prompt?: string;
+
+  @IsOptional()
+  @IsString()
+  negative_prompt?: string;
 }

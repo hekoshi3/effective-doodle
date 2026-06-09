@@ -9,8 +9,7 @@ export const UserSidebar = (
         toggleFollow,
         auth,
         isOwnProfile,
-        isUpdatingFollow,
-        currentUserProfile }: userSideProps
+        isUpdatingFollow }: userSideProps
 ) => {
     const avatar = userProfile.profile.avatar
     const username = userProfile.username
@@ -21,7 +20,7 @@ export const UserSidebar = (
                 <div className="w-full flex flex-col items-center justify-center pt-10 px-4">
                     <div className="relative">
                         {/* !!! */}
-                        <Image src={avatar || "/img/nacho.png"} width={128} height={128} alt={username} loading="eager" preload={true} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
+                        <Image src={avatar || "/img/nacho.png"} width={512} height={512} alt={username} loading="eager" preload={true} className="rounded-full h-32 w-32 object-cover border-4 border-neutral-800" />
                     </div>
                     <p className="text-2xl font-mono mt-4 text-white">{userProfile.username}</p>
                     <p className="text-sm font-extralight text-neutral-400 mt-2">{displayCount} подписчиков</p>
@@ -44,27 +43,26 @@ export const UserSidebar = (
                         )}
                     </div>
 
-                    {currentUserProfile && (
-                        <div className="grid grid-cols-2 gap-4 mt-4 w-full">
-                            <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{userProfile.stats.total_likes}</p>
-                                <p className="text-[10px] uppercase text-neutral-500">Лайков</p>
-                            </div>
-                            <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{userProfile.stats.total_downloads}</p>
-                                <p className="text-[10px] uppercase text-neutral-500">Загрузок</p>
-                            </div>
-                            <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{userProfile.stats.images_count}</p>
-                                <p className="text-[10px] uppercase text-neutral-500">Изображений</p>
-                            </div>
-                            <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
-                                <p className="text-xl font-bold text-white">{userProfile.stats.models_count}</p>
-                                <p className="text-[10px] uppercase text-neutral-500">Моделей</p>
-                            </div>
+                    <div className="grid grid-cols-2 gap-4 mt-4 w-full">
+                        <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
+                            <p className="text-xl font-bold text-white">{userProfile.stats.total_likes}</p>
+                            <p className="text-[10px] uppercase text-neutral-500">Лайков</p>
                         </div>
-                    )}
-                   
+                        <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
+                            <p className="text-xl font-bold text-white">{userProfile.stats.total_downloads}</p>
+                            <p className="text-[10px] uppercase text-neutral-500">Загрузок</p>
+                        </div>
+                        <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
+                            <p className="text-xl font-bold text-white">{userProfile.stats.images_count}</p>
+                            <p className="text-[10px] uppercase text-neutral-500">Изображений</p>
+                        </div>
+                        <div className="bg-neutral-800/40 p-3 rounded-xl text-center">
+                            <p className="text-xl font-bold text-white">{userProfile.stats.models_count}</p>
+                            <p className="text-[10px] uppercase text-neutral-500">Моделей</p>
+                        </div>
+                    </div>
+
+
                     <p className="mt-3 text-sm text-ellipsis min-w-full max-w-full max-h-110 whitespace-pre-wrap wrap-break-word truncate bg-neutral-800/40 rounded-xl p-2">{bio}</p>
                 </div>
             </div>

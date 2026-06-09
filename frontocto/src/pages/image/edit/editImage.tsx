@@ -26,6 +26,8 @@ export function ImageEditPage() {
     const [error, setError] = useState<string | null>(null);
 
     const [description, setDescription] = useState("");
+    const [prompt, setPrompt] = useState("")
+    const [negPrompt, setNegPrompt] = useState("")
     const [tags, setTags] = useState<string[]>([]);
 
     const [allTags, setAllTags] = useState<string[]>([]);
@@ -51,6 +53,8 @@ export function ImageEditPage() {
                 setImage(data);
                 setDescription(data.description || "");
                 setIsAuthor((auth.user && data && auth.user.username === data.author.username) || false);
+                setPrompt(data.generation_params.prompt || "")
+                setNegPrompt(data.generation_params.negative_prompt || "")
                 if (Array.isArray(data.tags)) {
                     setTags(data.tags.map((t: any) => typeof t === "string" ? t : t.name));
                 }
@@ -107,7 +111,7 @@ export function ImageEditPage() {
             const res = await makeAuthenticatedRequest(`${API_HOST}/images/${image.id}/`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ description, tags, is_published: false }),
+                body: JSON.stringify({ description, tags, is_published: false, prompt, negative_prompt: negPrompt }),
             });
             if (!res.ok) throw new Error("Failed to save");
             const updated = await res.json();
@@ -125,7 +129,7 @@ export function ImageEditPage() {
             const res = await makeAuthenticatedRequest(`${API_HOST}/images/${image.id}/`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ is_published: true, description, tags }),
+                body: JSON.stringify({ is_published: true, description, tags, prompt, negative_prompt: negPrompt }),
             });
             if (!res.ok) throw new Error("Publish failed");
             router.push(`/image/${image.id}`);
@@ -233,6 +237,46 @@ export function ImageEditPage() {
                                     ))}
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="bg-neutral-800 rounded-2xl p-6 border border-neutral-700">
+                            <h3 className="text-sm uppercase tracking-widest text-neutral-500 font-bold mb-6">Параметры генерации</h3>
+                            <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                                {[
+                                    { label: "Model", value: image.generation_params?.model ?? "" },
+                                    { label: "Sampler", value: image.generation_params?.sampler ?? "" },
+                                    { label: "Scheduler", value: image.generation_params?.schedule_type ?? "" },
+                                    { label: "Seed", value: image.generation_params?.seed ?? "" },
+                                    { label: "Steps", value: image.generation_params?.steps ?? "" },
+                                    { label: "CFG Scale", value: image.generation_params?.cfg_scale ?? "" },
+                                    { label: "Resolution", value: `${image.generation_params?.width ?? ""} × ${image.generation_params?.height ?? ""}` },
+                                ].map((item, i) => item.value && (
+                                    <div key={i} className="flex flex-col border-l-2 border-neutral-700 pl-3">
+                                        <span className="text-neutral-500 text-[10px] uppercase font-bold">{item.label}</span>
+                                        <span className="text-neutral-200 font-mono truncate">{item.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-neutral-700 flex flex-col">
+                                <label className="text-neutral-500 text-[10px] uppercase font-bold">Prompt</label>
+                                <textarea
+                                    className="mt-2 p-3 h-40 resize-none bg-neutral-900/50 rounded-lg text-sm text-neutral-200 focus:border-accent leading-relaxed wrap-break-word whitespace-pre-wrap font-mono"
+                                    value={prompt}
+                                    onChange={(e) => {setPrompt(e.target.value)}}>
+                                </textarea>
+                            </div>
+
+
+                            <div className="mt-4 flex flex-col">
+                                <label className="text-[10px] uppercase font-bold text-red-400/60">Negative Prompt</label>
+                                <textarea
+                                    className="mt-2 p-3 h-40 resize-none bg-neutral-900/50 rounded-lg text-sm text-neutral-200 focus:border-accent leading-relaxed wrap-break-word whitespace-pre-wrap font-mono"
+                                    value={negPrompt}
+                                    onChange={(e) => setNegPrompt(e.target.value)}>
+                                </textarea>
+                            </div>
+
                         </div>
 
                         <div className="flex gap-4 mt-8">
