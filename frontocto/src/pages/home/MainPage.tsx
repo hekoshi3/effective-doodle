@@ -168,6 +168,7 @@ export function MainPage() {
                                 value={imgAuthor}
                                 onChange={setImgAuthor}
                                 placeholder="Пользователь"
+                                className=" w-full md:max-w-35"
                                 options={users.map(u => ({ value: u.id.toString(), label: u.username }))}
                             />
                         )}
@@ -175,26 +176,27 @@ export function MainPage() {
                             value={imgLinkedModel}
                             onChange={setImgLinkedModel}
                             placeholder="Модель"
+                            className=" w-full md:max-w-35"
                             options={availableModels.map(m => ({ value: m.id.toString(), label: m.name }))}
+                        />
+                        <Select value={imgMinLikes} onChange={setImgMinLikes} placeholder="Лайки" options={LIKE_OPTIONS} className=" w-full md:max-w-35" />
+                        <Select value={imgDateRange} onChange={setImgDateRange} placeholder="За все время" options={DATE_OPTIONS} className=" w-full md:max-w-35" />
+                        <Select
+                            value={imgSort}
+                            onChange={setImgSort}
+                            placeholder="Недавние"
+                            className=" w-full md:max-w-35"
+                            options={[
+                                { value: "-likes_count", label: "По лайкам" },
+                            ]}
                         />
                         <input
                             type="text"
                             value={imgTag}
                             onChange={(e) => setImgTag(e.target.value)}
-                            placeholder="Введите тэг..." // !!! tag autocomplete
-                            className="bg-neutral-800 text-sm p-2 rounded border border-neutral-700 w-32 outline-none focus:border-accent"
+                            placeholder=" Введите тэг..." // !!! tag autocomplete
+                            className="bg-neutral-800 text-sm p-1.75 w-full md:max-w-35 rounded border border-neutral-700 outline-none focus:border-accent"
                             autoComplete="off"
-                        />
-                        <Select value={imgMinLikes} onChange={setImgMinLikes} placeholder="Лайки" options={LIKE_OPTIONS} />
-                        <Select value={imgDateRange} onChange={setImgDateRange} placeholder="Время" options={DATE_OPTIONS} />
-                        <Select
-                            value={imgSort}
-                            onChange={setImgSort}
-                            placeholder="Сортировка"
-                            options={[
-                                { value: "-created_at", label: "Новое" },
-                                { value: "-likes_count", label: "Популярное" },
-                            ]}
                         />
                     </div>
                 </div>
@@ -202,7 +204,7 @@ export function MainPage() {
                     <div className="text-center py-20 text-neutral-500 italic">Не найдено изображений по текущему запросу.</div>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-                        {gallery.slice(0,10).map((img, i) => <AuthImageCard key={img.id} image={img} index={i} />)}
+                        {gallery.slice(0, 10).map((img, i) => <AuthImageCard key={img.id} image={img} index={i} />)}
                     </div>
                 )}
             </section>
@@ -213,36 +215,46 @@ export function MainPage() {
                         {feedMode === "following" ? "Модели из подписок" : "Модели"}
                     </h1>
                     <div className="flex flex-wrap gap-2 items-center bg-neutral-800/30 p-3 rounded-lg border border-neutral-800">
-                        <Select value={modelType} onChange={setModelType} placeholder="Тип" options={modelTypes} />
+                        <Select value={modelType} onChange={setModelType} placeholder="Тип" options={modelTypes} className=" w-full md:max-w-35" />
                         {feedMode === "global" && (
                             <Select
                                 value={modelAuthor}
                                 onChange={setModelAuthor}
                                 placeholder="Пользователь"
+                                className=" w-full md:max-w-35"
                                 options={users.map(u => ({ value: u.id.toString(), label: u.username }))}
                             />
                         )}
+                        <Select value={modelMinLikes} onChange={setModelMinLikes} placeholder="Лайки" options={LIKE_OPTIONS} className=" w-full md:max-w-35 " />
+                        <Select
+                            value={modelMinDownloads}
+                            onChange={setModelMinDownloads}
+                            placeholder="Скачивания"
+                            options={[
+                                { value: "50", label: "50+ скачиваний" },
+                                { value: "200", label: "200+ скачиваний" },
+                                { value: "1000", label: "1000+ скачиваний" }]}
+                            className=" w-full md:max-w-35"
+                        />
+                        <Select value={modelDateRange} onChange={setModelDateRange} placeholder="За все время" options={DATE_OPTIONS} className=" w-full md:max-w-35" />
+                        <Select
+                            value={modelSort}
+                            onChange={setModelSort}
+                            placeholder="Недавние"
+                            className=" w-full md:max-w-35"
+                            options={[
+                                { value: "-downloads_count", label: "По загрузкам" },
+                                { value: "-likes_count", label: "По лайкам" },
+                                { value: "-rating", label: "По рейтингу" },
+                            ]} //{ value: "-created_at", label: "Недавние" },
+                        />
                         <input
                             type="text"
                             value={modelTag}
                             onChange={(e) => setModelTag(e.target.value)}
-                            placeholder="Введите тэг..."
-                            className="bg-neutral-800 text-sm p-2 rounded border border-neutral-700 w-32 outline-none focus:border-accent"
+                            placeholder=" Введите тэг..."
+                            className="bg-neutral-800 text-sm p-1.75 w-full md:max-w-35 rounded border border-neutral-700 outline-none focus:border-accent"
                             autoComplete="off"
-                        />
-                        <Select value={modelMinLikes} onChange={setModelMinLikes} placeholder="Лайки" options={LIKE_OPTIONS} />
-                        <Select value={modelMinDownloads} onChange={setModelMinDownloads} placeholder="Скачивания" options={[{ value: "50", label: "50+ DL" }, { value: "200", label: "200+ DL" }, { value: "1000", label: "1000+ DL" }]} />
-                        <Select value={modelDateRange} onChange={setModelDateRange} placeholder="Время" options={DATE_OPTIONS} />
-                        <Select
-                            value={modelSort}
-                            onChange={setModelSort}
-                            placeholder="Sort"
-                            options={[
-                                { value: "-created_at", label: "Недавние" },
-                                { value: "-downloads_count", label: "По загрузкам" },
-                                { value: "-likes_count", label: "По лайкам" },
-                                { value: "-rating", label: "По рейтингу" },
-                            ]}
                         />
                     </div>
                 </div>
