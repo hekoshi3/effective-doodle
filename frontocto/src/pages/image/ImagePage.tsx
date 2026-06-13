@@ -152,6 +152,22 @@ export function ImageDetailPage() {
                                 priority
                             />
                         </div>
+                        <div className="p-2 border-b border-neutral-700">
+                            <span className="text-[10px] uppercase font-bold text-neutral-500 px-2">Связанная модель</span>
+                            <Link
+                                key={`m-${image.linked_model}`}
+                                href={`/model/${image.linked_model.id}`}
+                                className="flex items-center gap-3 p-2 hover:bg-neutral-700 rounded-lg transition-colors group"
+                            >
+                                <div className="relative w-10 h-10 shrink-0 bg-neutral-900 rounded overflow-hidden">
+                                    <Image src={image.linked_model.image || "/image404.png"} alt="" fill className="object-cover" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-sm font-bold text-white truncate group-hover:text-accent">{image.linked_model.name}</div>
+                                    <div className="text-[10px] text-neutral-500">{image.linked_model.type} • @{image.linked_model.authorName /* !!! */}</div>
+                                </div>
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-8">

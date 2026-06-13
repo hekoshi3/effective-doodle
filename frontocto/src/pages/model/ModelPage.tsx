@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Model } from "@/entities/AImodel";
 import { useAuth } from "@/entities/user";
 import { CommentList, Comment } from "@/entities/comment";
+import { GalleryImage } from "@/entities/AIimage";
 
 const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "/api";
 
@@ -14,7 +15,7 @@ export function ModelDetailPage() {
     const params = useParams();
     const router = useRouter();
     const modelId = params?.id as string;
-    
+
     const [model, setModel] = useState<Model | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -22,13 +23,16 @@ export function ModelDetailPage() {
     const [commentText, setCommentText] = useState("");
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [results, setResults] = useState<{ images: GalleryImage[] }>({
+        images: []
+    });
 
     // Состояние тегов (нормализованное)
     const [tags, setTags] = useState<string[]>([]);
-    
+
     const auth = useAuth();
     const makeAuthenticatedRequest = auth.makeAuthenticatedRequest as (url: string, options?: RequestInit) => Promise<Response>;
-    
+
     // Проверка на авторство
     const isAuthor = auth.user && model && auth.user.username === model.author.username;
 
@@ -48,9 +52,9 @@ export function ModelDetailPage() {
                 const modelRes = auth.token
                     ? await makeAuthenticatedRequest(`${API_HOST}/models/${modelId}/`)
                     : await fetch(`${API_HOST}/models/${modelId}/`);
-                
+
                 if (!modelRes.ok) throw new Error("Произошла ошибка");
-                
+
                 const modelData: Model = await modelRes.json();
                 setModel(modelData);
 
@@ -62,12 +66,18 @@ export function ModelDetailPage() {
                 const commentsRes = auth.token
                     ? await makeAuthenticatedRequest(`${API_HOST}/comments/?aimodel=${modelId}`)
                     : await fetch(`${API_HOST}/comments/?aimodel=${modelId}`);
-                
+
                 if (commentsRes.ok) {
                     const commentsData: CommentList = await commentsRes.json();
                     setComments(commentsData.results || []);
                 }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const imgRes = await fetch(`${API_HOST}/images/?ordering=-likes_count&linked_model=${modelId}`)
+                const imgData = await imgRes.json();
+
+                setResults({
+                    images: imgData.results.slice(0, 4)
+                });
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 setError(err.message || "Произошла ошибка при загрузке модели");
             } finally {
@@ -178,6 +188,25 @@ export function ModelDetailPage() {
                                 priority
                             />
                         </div>
+                        {results.images.length > 0 && (
+                            <div className="p-2">
+                                <span className="text-[10px] uppercase font-bold text-neutral-500 px-2">Топ изображений</span>
+                                <div className="grid grid-cols-2 gap-2 p-2">
+                                    {results.images.map(img => (
+                                        <Link
+                                            key={`i-${img.id}`}
+                                            href={`/image/${img.id}`}
+                                            className="relative aspect-square rounded overflow-hidden hover:ring-2 ring-accent transition-all"
+                                        >
+                                            <Image src={img.image} alt="" fill className="object-cover" />
+                                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-1 text-[9px] text-white truncate">
+                                                @{img.author.username/* !!! */}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-8">
@@ -194,7 +223,7 @@ export function ModelDetailPage() {
                                 </div>
                             </div>
                             {isAuthor && (
-                                <Link 
+                                <Link
                                     href={`/model/edit/${model.id}`}
                                     className="bg-neutral-700 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-semibold flex items-center gap-2"
                                 >
@@ -258,7 +287,7 @@ export function ModelDetailPage() {
                                 disabled={isDownloading}
                                 className="w-full bg-accent hover:bg-opacity-80 text-black font-black py-4 rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-accent/10 disabled:opacity-50"
                             >
-                                {isDownloading ? <span className="loading loading-spinner"></span> : <>СКАЧАТЬ МОДЕЛЬ <span className="opacity-50 text-xs">{model.file_hash?.substring(0,8) || ""}</span></>}
+                                {isDownloading ? <span className="loading loading-spinner"></span> : <>СКАЧАТЬ МОДЕЛЬ <span className="opacity-50 text-xs">{model.file_hash?.substring(0, 8) || ""}</span></>}
                             </button>
                         </div>
 

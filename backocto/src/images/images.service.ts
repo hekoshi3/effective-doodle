@@ -21,7 +21,7 @@ export class ImagesService {
   ) {}
 
   private mapImage(img: any, currentUserId?: number) {
-    const { generation_params, ...cleanImg } = img;
+    const { generation_params, linkedModel, linkedModelId, ...cleanImg } = img;
     let filteredParams = undefined;
     if (generation_params) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -38,6 +38,16 @@ export class ImagesService {
       likes_count: img.likes_count ?? img._count?.likes ?? 0,
       is_liked: currentUserId ? img.likes?.length > 0 : false,
       created_at: img.createdAt,
+      linked_model: {
+        id: linkedModelId,
+        name: linkedModel?.name,
+        image: this.mediaService.getAbsoluteUrl(
+          linkedModel?.featuredImage?.image,
+        ),
+        type: linkedModel?.modelType,
+        authorId: linkedModel?.authorId,
+        authorName: linkedModel?.author?.username,
+      },
       author: {
         id: img.authorId,
         username: img.author.username,
@@ -107,8 +117,16 @@ export class ImagesService {
   }
 
   async findAll(query: BaseQueryDto, currentUserId?: number) {
-    const { ordering, author, tag, created_after, feed, search, min_likes } =
-      query;
+    const {
+      ordering,
+      author,
+      tag,
+      created_after,
+      feed,
+      search,
+      min_likes,
+      linked_model,
+    } = query;
 
     const where: any = {
       AND: [
@@ -156,6 +174,10 @@ export class ImagesService {
       };
     }
 
+    if (linked_model) {
+      where.AND.push({ linkedModelId: linked_model });
+    }
+
     let orderBy: any = { createdAt: 'desc' };
 
     if (ordering) {
@@ -178,6 +200,11 @@ export class ImagesService {
         where,
         orderBy,
         include: {
+          linkedModel: {
+            select: {
+              name: true,
+            },
+          },
           author: {
             select: {
               id: true,
@@ -204,6 +231,21 @@ export class ImagesService {
     const img = await this.prisma.generatedImage.findUnique({
       where: { id },
       include: {
+        linkedModel: {
+          select: {
+            name: true,
+            modelType: true,
+            authorId: true,
+            author: {
+              select: {
+                username: true,
+              },
+            },
+            featuredImage: {
+              select: { image: true },
+            },
+          },
+        },
         author: {
           select: {
             id: true,
@@ -219,7 +261,6 @@ export class ImagesService {
           : false,
         _count: { select: { likes: true } },
         tags: true,
-        linkedModel: true,
       },
     });
     if (!img) throw new NotFoundException('Image not found');
@@ -253,7 +294,6 @@ export class ImagesService {
       ...(prompt !== undefined && { prompt }),
       ...(negative_prompt !== undefined && { negative_prompt }),
     };
-
     const updated = await this.prisma.generatedImage.update({
       where: { id },
       data: {

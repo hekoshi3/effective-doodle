@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class BaseQueryDto {
   @IsOptional() @IsString() ordering?: string;
@@ -10,4 +10,5 @@ export class BaseQueryDto {
   @IsOptional() @IsString() download_count?: string;
   @IsOptional() @IsString() search?: string;
   @IsOptional() @IsString() min_likes?: string;
+  @IsOptional() @IsNumber() linked_model?: number;
 }

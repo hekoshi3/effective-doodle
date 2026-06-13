@@ -29,7 +29,14 @@ export interface GalleryImage {
   is_published: boolean;
   likes_count: number;
   created_at: Date;
-  linked_model: number;
+  linked_model: {
+    id: number;
+    name: string;
+    image: string;
+    type: string;
+    authorId: number;
+    authorName: string;
+  };
   resources: undefined[];
 }
 
@@ -57,14 +64,14 @@ export interface GenParams {
 }
 
 export interface API_Host_Response {
-    images: string[];
-    parameters: Record<string, string>;
-    info: string;
+  images: string[];
+  parameters: Record<string, string>;
+  info: string;
 }
 
 export interface GenerationResponse {
-    bufferImage: Blob;
-    images: string[];
-    parameters: Record<string, string>;
-    info: string;
+  bufferImage: Blob;
+  images: string[];
+  parameters: Record<string, string>;
+  info: string;
 }

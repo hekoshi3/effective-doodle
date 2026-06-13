@@ -24,14 +24,13 @@ export const ImageCard = ({ image, statusBadge, index = 0 }: ImgCardProps) => {
                     {statusBadge}
                 </div>
 
-
                 <div className="dropdown dropdown-end">
                     <div tabIndex={0} role="button" className="bg-black/40 hover:bg-black/60 cursor-pointer rounded-lg p-2 backdrop-blur-md transition-all">
                         <Image src="/menu-white.svg" alt="Menu" width={18} height={18} />
                     </div>
                     <ul tabIndex={0} className="dropdown-content menu bg-neutral-900 border border-neutral-700 rounded-xl z-30 p-2 mt-2 shadow-2xl w-56 text-[11px]">
                         <li className="menu-title text-neutral-500 text-[10px] uppercase">Параметры генерации</li>
-                        <li className="truncate text-neutral-300"><span>Model: {image.linked_model || image.generation_params?.model || "N/A"}</span></li>
+                        <li className="truncate text-neutral-300"><span>Model: {image.generation_params?.model || "N/A"}</span></li>
                         <li className="truncate text-neutral-300"><span>Sampler: {image.generation_params?.sampler || "N/A"}</span></li>
                         <li className="truncate text-neutral-300"><span>Seed: {image.generation_params?.seed || "N/A"}</span></li>
                         <li className="truncate text-neutral-300"><span>Size: {image.generation_params?.width || image.width }x{image.generation_params?.height || image.height}</span></li>

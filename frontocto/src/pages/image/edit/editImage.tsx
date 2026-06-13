@@ -7,6 +7,7 @@ import Image from "next/image";
 import { GalleryImage } from "@/entities/AIimage";
 import { useAuth } from "@/entities/user";
 import Link from "next/link";
+import { Model } from "@/entities/AImodel";
 
 const API_HOST = process.env.NEXT_PUBLIC_BACKEND_API || "/api";
 
@@ -37,6 +38,9 @@ export function ImageEditPage() {
     const [isPublishing, setIsPublishing] = useState(false);
     const [isAuthor, setIsAuthor] = useState(false);
 
+    const [availableModels, setAvailableModels] = useState<Model[]>([]);
+    const [imgLinkedModel, setImgLinkedModel] = useState("");
+
     useEffect(() => {
         if (!id || auth.isLoading) return;
 
@@ -53,8 +57,8 @@ export function ImageEditPage() {
                 setImage(data);
                 setDescription(data.description || "");
                 setIsAuthor((auth.user && data && auth.user.username === data.author.username) || false);
-                setPrompt(data.generation_params.prompt || "")
-                setNegPrompt(data.generation_params.negative_prompt || "")
+                setPrompt(data.generation_params?.prompt || "")
+                setNegPrompt(data.generation_params?.negative_prompt || "")
                 if (Array.isArray(data.tags)) {
                     setTags(data.tags.map((t: any) => typeof t === "string" ? t : t.name));
                 }
@@ -69,6 +73,7 @@ export function ImageEditPage() {
     }, [id, auth.token, auth.isLoading, makeAuthenticatedRequest, auth.user]);
 
     useEffect(() => {
+        fetch(`${API_HOST}/models/`).then(res => res.json()).then(data => setAvailableModels(data.results || []));
         fetch(`${API_HOST}/tags/`)
             .then((r) => (r.ok ? r.json() : []))
             .then((data) => {
@@ -78,6 +83,19 @@ export function ImageEditPage() {
             })
             .catch(() => { });
     }, []);
+
+    const Select = ({ value, onChange, options = [], placeholder, className = "" }: any) => (
+        <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={`bg-neutral-800 text-sm text-neutral-400 p-2 rounded border border-neutral-700 outline-none focus:border-accent ${className}`}
+        >
+            <option value="">{placeholder}</option>
+            {Array.isArray(options) && options.map((opt: any) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+        </select>
+    );
 
     const suggestions =
         tagInput.trim() === ""
@@ -111,7 +129,7 @@ export function ImageEditPage() {
             const res = await makeAuthenticatedRequest(`${API_HOST}/images/${image.id}/`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ description, tags, is_published: false, prompt, negative_prompt: negPrompt }),
+                body: JSON.stringify({ description, tags, is_published: false, prompt, negative_prompt: negPrompt, linked_model: Number(imgLinkedModel) }),
             });
             if (!res.ok) throw new Error("Failed to save");
             const updated = await res.json();
@@ -129,7 +147,7 @@ export function ImageEditPage() {
             const res = await makeAuthenticatedRequest(`${API_HOST}/images/${image.id}/`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ is_published: true, description, tags, prompt, negative_prompt: negPrompt }),
+                body: JSON.stringify({ is_published: true, description, tags, prompt, negative_prompt: negPrompt, linked_model: Number(imgLinkedModel) }),
             });
             if (!res.ok) throw new Error("Publish failed");
             router.push(`/image/${image.id}`);
@@ -137,7 +155,7 @@ export function ImageEditPage() {
     };
 
     if (isLoading) return <main className="flex min-h-screen items-center justify-center bg-neutral-900"><span className="loading loading-ring loading-xl text-accent"></span></main>;
-    if (error || !image || !isAuthor) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Image not found"}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
+    if (error || !image || !isAuthor) return <main className="flex w-screen flex-col items-center justify-center min-h-screen bg-neutral-900 text-white"><p className="text-xl">{"Image not found" + error}</p><Link href="/" className="mt-4 text-accent hover:underline">Go back</Link></main>;
 
     return (
         <main className="bg-neutral-900 min-h-screen text-white font-sans">
@@ -238,9 +256,16 @@ export function ImageEditPage() {
                                 </div>
                             </div>
                         </div>
-
                         <div className="bg-neutral-800 rounded-2xl p-6 border border-neutral-700">
-                            <h3 className="text-sm uppercase tracking-widest text-neutral-500 font-bold mb-6">Параметры генерации</h3>
+                            <h3 className="text-sm uppercase tracking-widest text-neutral-500 font-bold mb-2">Используемая модель</h3>
+                            <Select
+                                value={imgLinkedModel}
+                                onChange={setImgLinkedModel}
+                                placeholder="Модель"
+                                className=" w-full md:max-w-35"
+                                options={availableModels.map(m => ({ value: m.id.toString(), label: m.name }))}
+                            />
+                            <h3 className="text-sm uppercase tracking-widest text-neutral-500 font-bold mb-6 mt-4">Параметры генерации</h3>
                             <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
                                 {[
                                     { label: "Model", value: image.generation_params?.model ?? "" },
@@ -262,8 +287,8 @@ export function ImageEditPage() {
                                 <label className="text-neutral-500 text-[10px] uppercase font-bold">Prompt</label>
                                 <textarea
                                     className="mt-2 p-3 h-40 resize-none bg-neutral-900/50 rounded-lg text-sm text-neutral-200 focus:border-accent leading-relaxed wrap-break-word whitespace-pre-wrap font-mono"
-                                    value={prompt}
-                                    onChange={(e) => {setPrompt(e.target.value)}}>
+                                    value={prompt ?? ""}
+                                    onChange={(e) => { setPrompt(e.target.value) }}>
                                 </textarea>
                             </div>
 
